@@ -69,7 +69,6 @@ export class ChatComponent implements OnInit {
             let messageModel: ChatMessage = new ChatMessage();
             messageModel.message = message;
             messageModel.timestamp = new Date();
-            messageModel.nickname = this.nickname;
 
             this.socket.next(messageModel);
          }
@@ -93,16 +92,13 @@ export class ChatComponent implements OnInit {
    /** Handles a message which was received through the websocket */
    private handleMessage(messageData : any):void {
       let messageModel = messageData as Message;
+      this.resolveMessageIdentifier(messageModel);
 
       if(messageModel.messageType != undefined) {
          switch(messageModel.messageType) {
             case MessageType.ChatMessage:
                let chatMessage = Object.assign(new ChatMessage(), messageModel);
 
-               if(this.userDictionary.has(chatMessage.senderGuid)) {
-                  chatMessage.nickname = this.userDictionary.get(chatMessage.senderGuid).nickname;
-               }
-               
                this.messages.push(chatMessage);
                this.scrollToBottom();
             break;
@@ -118,6 +114,9 @@ export class ChatComponent implements OnInit {
                }
 
                this.userDictionary.set(joinMessage.chatUser.identifier, joinMessage.chatUser);
+
+               //since this is a new user and his guid wasn't saved in the user-dictionary, the previous resolve didn't work and we have to resolve it now
+               this.resolveMessageIdentifier(joinMessage);
                this.updateNicknameStringAggregation();
                this.messages.push(joinMessage);
             break;
@@ -132,7 +131,6 @@ export class ChatComponent implements OnInit {
 
             case MessageType.LeaveRoom:
                let leaveRoomMessage = Object.assign(new LeaveRoomMessage(), messageModel);
-               leaveRoomMessage.nickname = this.userDictionary.get(leaveRoomMessage.senderGuid).nickname;
 
                this.userDictionary.delete(leaveRoomMessage.senderGuid);
                this.messages.push(leaveRoomMessage);
@@ -157,6 +155,13 @@ export class ChatComponent implements OnInit {
          }
       }
    }
+
+   /** Resolve the guid of the message's sender and save his name in the identifier model */
+   private resolveMessageIdentifier(identifierModel: any): void {
+      if(identifierModel.senderGuid && this.userDictionary.has(identifierModel.senderGuid)) {
+         identifierModel.senderName = this.userDictionary.get(identifierModel.senderGuid).nickname;
+      }
+   }   
 
    /** Checks whether a specific nickname is currently available */
    private isNicknameAvailable(requestedNickname: string):boolean {

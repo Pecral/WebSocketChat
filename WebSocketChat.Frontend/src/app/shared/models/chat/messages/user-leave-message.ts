@@ -7,7 +7,4 @@ export class LeaveRoomMessage extends MessageIdentifier implements Message {
 
 	/** The identifier of the room that the user has left. RoomIdentifier = 0 indicates that it was the server. */
 	roomIdentifier: number;
-
-	/** Nickname of the user that has left (clientside-only) */
-	nickname: string;
 }

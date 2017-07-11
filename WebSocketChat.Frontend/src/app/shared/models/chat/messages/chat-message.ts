@@ -10,9 +10,6 @@ export class ChatMessage extends MessageIdentifier implements Message {
 
   /** The actual message */
   message : string;
-
-  /** The nickname of the user who posted this message (not sent by the server because it can be extracted from the user dictionary) */
-  nickname : string;
   
   /** The room where the message was posted */
   room : string;

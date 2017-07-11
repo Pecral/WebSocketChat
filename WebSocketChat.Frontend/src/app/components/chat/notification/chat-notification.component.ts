@@ -25,14 +25,11 @@ export class ChatNotificationComponent implements OnInit {
 
   /** Returns the nickname of the user who caused this message  */
   getNickname(): string {
-    if(this.notificationMessage instanceof UserIdentifierMessage) {
-      return this.notificationMessage.chatUser.nickname;
-    }
-    else if(this.notificationMessage instanceof LeaveRoomMessage) {
-      return this.notificationMessage.nickname;
+    if(this.notificationMessage instanceof NicknameRequest) {
+      return this.notificationMessage.oldNickname; 
     }
     else {
-      return this.notificationMessage.oldNickname;
+      return this.notificationMessage.senderName;
     }
   }
 

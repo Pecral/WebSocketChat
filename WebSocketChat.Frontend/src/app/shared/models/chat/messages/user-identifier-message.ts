@@ -10,5 +10,4 @@ export class UserIdentifierMessage extends MessageIdentifier implements Message 
 
 	/**The user that has joined the room/server */
 	chatUser: ChatUser;
-
 }

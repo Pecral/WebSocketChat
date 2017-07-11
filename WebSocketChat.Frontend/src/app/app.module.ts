@@ -1,18 +1,22 @@
-import { ChatRoomComponent } from './components/chat/room/chat-room.component';
-import { TestService } from './shared/services/test.service';
-import { ChatNotificationComponent } from './components/chat/notification/chat-notification.component';
-import { WebsocketService } from './shared/services/websocket-chat.service';
-import { ChatMessageComponent } from './components/chat/message/chat-message.component';
-import { ChatComponent } from './components/chat/chat.component';
+/** Angular Modules  */
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
+/** 3rd Party */
 import { SplitPaneModule } from 'ng2-split-pane/lib/ng2-split-pane';
-
-import { AppComponent } from './app.component';
-
 import { AccordionModule, PanelModule } from 'primeng/primeng';
+
+/** Components */
+import { AppComponent } from './app.component';
+import { ChatRoomComponent } from './components/chat/room/chat-room.component';
+import { ChatNotificationComponent } from './components/chat/notification/chat-notification.component';
+import { ChatMessageComponent } from './components/chat/message/chat-message.component';
+import { ChatComponent } from './components/chat/chat.component';
+
+/** Services  */
+import { WebsocketService } from './shared/services/websocket-chat.service';
 
 @NgModule({
   declarations: [
@@ -31,7 +35,7 @@ import { AccordionModule, PanelModule } from 'primeng/primeng';
     PanelModule,
     SplitPaneModule
   ],
-  providers: [WebsocketService, TestService],
+  providers: [WebsocketService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

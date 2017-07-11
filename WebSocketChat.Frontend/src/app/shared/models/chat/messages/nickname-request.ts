@@ -1,5 +1,6 @@
 import { MessageType } from '../message-type';
 import { Message, MessageIdentifier } from './../message';
+
 export class NicknameRequest extends MessageIdentifier implements Message {
 
 	messageType : MessageType = MessageType.NicknameRequest;

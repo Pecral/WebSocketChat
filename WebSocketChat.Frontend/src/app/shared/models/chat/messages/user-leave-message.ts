@@ -1,5 +1,6 @@
 import { Message, MessageIdentifier } from '../message';
 import { MessageType } from '../message-type';
+
 export class LeaveRoomMessage extends MessageIdentifier implements Message {
 	
 	messageType: MessageType = MessageType.LeaveRoom;

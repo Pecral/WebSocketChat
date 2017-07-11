@@ -1,9 +1,12 @@
+/** Angular */
+import { Component, OnInit, Input } from '@angular/core';
+
+/** Models */
 import { NicknameRequest } from './../../../shared/models/chat/messages/nickname-request';
-import { MessageType } from 'app/shared/models/chat/message-type';
+import { MessageType } from './../../../shared/models/chat/message-type';
 import { LeaveRoomMessage } from './../../../shared/models/chat/messages/user-leave-message';
 import { UserIdentifierMessage } from './../../../shared/models/chat/messages/user-identifier-message';
-import { Component, OnInit, Input } from '@angular/core';
-import { Message } from "app/shared/models/chat/message";
+import { Message } from "./../../../shared/models/chat/message";
 
 @Component({
   selector: 'chat-notification',

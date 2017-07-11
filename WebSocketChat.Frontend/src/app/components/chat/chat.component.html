@@ -13,9 +13,9 @@
   <div #chatWrapper class="chat-messages">
     <ol class="chat">
       <li *ngFor="let message of messages">
-        <chat-message *ngIf="message.messageType == messageType.ChatMessage" class="chat-message {{((message.senderGuid == identifier) ? 'self' : 'other')}}"
+        <chat-message *ngIf="message.messageType == messageType.ChatMessage;else notificationMessage" class="chat-message {{((message.senderGuid == identifier) ? 'self' : 'other')}}"
           [message]="message" [identifier]="identifier"></chat-message>
-        <chat-notification *ngIf="isNotificationMessage(message)" [notificationMessage]="message"></chat-notification>
+        <ng-template #notificationMessage><chat-notification [notificationMessage]="message"></chat-notification></ng-template>
       </li>
     </ol>
   </div>

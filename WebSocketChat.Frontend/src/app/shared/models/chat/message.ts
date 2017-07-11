@@ -1,4 +1,4 @@
-import { MessageType } from "app/shared/models/chat/message-type";
+import { MessageType } from "../../models/chat/message-type";
 
 export interface Message {
     messageType : MessageType;
@@ -10,4 +10,7 @@ export class MessageIdentifier {
 
     /** Timestamp when the message was sent */
     timestamp : Date;
+
+    /** Every sender-guid represents either a user or the server himself. We will lookup the name of the server and automatically set this property for every received message */
+    senderName : string;
 }

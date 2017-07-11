@@ -1,0 +1,24 @@
+<div class="chat-app-wrapper">
+  <div class="chat-menu container-fluid">
+    <div class="row flex-nowrap">
+      <div class="col-md-3 menu-back">
+        <a href="#" class="back"><i class="fa fa-angle-left"></i> <img src="https://i.imgur.com/G4EjwqQ.jpg" draggable="false"/></a>
+      </div>
+      <div class="col-md-">
+        <div class="name">Random chat</div>
+        <div class="members"><b>{{nickname}}</b>{{nicknamesAggregation}}</div>
+      </div>
+    </div>
+  </div>
+  <div #chatWrapper class="chat-messages">
+    <ol class="chat">
+      <li *ngFor="let message of messages">
+        <chat-message *ngIf="message.messageType == messageType.ChatMessage" class="chat-message {{((message.senderGuid == identifier) ? 'self' : 'other')}}"
+          [message]="message" [identifier]="identifier"></chat-message>
+        <chat-notification *ngIf="isNotificationMessage(message)" [notificationMessage]="message"></chat-notification>
+      </li>
+    </ol>
+  </div>
+  <input class="chat-input" type="text" placeholder="Type here!" [(ngModel)]="currentMessage" (keyup.enter)="sendMessage(currentMessage)" />
+</div>
+<!--<div class="emojis"></div>-->

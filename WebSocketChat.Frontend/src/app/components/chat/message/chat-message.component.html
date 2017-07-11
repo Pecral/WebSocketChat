@@ -1,0 +1,8 @@
+<div class="wrapper {{((message.senderGuid == identifier) ? 'self' : 'other')}}">
+  <div *ngIf="(message.senderGuid != identifier)" class="avatar"><img [src]="message.avatarSourceUrl" draggable="false" /></div>
+  <div class="msg">
+    <div *ngIf="(message.senderGuid != identifier)" class="user">{{message.nickname}}</div>
+    <p>{{message.message}}</p>
+    <time>{{message.timestamp.toLocaleTimeString()}}</time>
+  </div>
+</div>

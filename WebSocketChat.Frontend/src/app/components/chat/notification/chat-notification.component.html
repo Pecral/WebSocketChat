@@ -1,1 +1,4 @@
-<p class="notification">{{getNickname()}} {{getMessage()}} <time>{{notificationMessage.timestamp.getHours()}}:{{notificationMessage.timestamp.getMinutes()}}</time></p>
+<p class="notification">
+   <span class="content">{{getNickname()}} {{getMessage()}}</span>
+   <time>{{notificationMessage.timestamp.getHours()}}:{{notificationMessage.timestamp.getMinutes()}}</time>
+</p>

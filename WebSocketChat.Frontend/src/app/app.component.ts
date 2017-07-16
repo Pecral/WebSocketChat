@@ -1,4 +1,4 @@
-import { WebsocketService } from './shared/services/websocket-chat.service';
+import { ChatService } from './shared/services/websocket-chat.service';
 import { environment } from './../environments/environment';
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 

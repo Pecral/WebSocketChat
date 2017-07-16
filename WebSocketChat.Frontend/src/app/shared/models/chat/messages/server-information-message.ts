@@ -10,6 +10,6 @@ export class ServerInformationMessage extends MessageIdentifier implements Messa
 	/** A guid-to-chatpartner dictionary of all users which are connected to the server */
 	userDictionary: { [key: string]: ChatUser };
 
-	/** List of all available chatrooms  */
-	availableRooms: ChatRoom[];
+	/** Dictionary of all available chatrooms  */
+	availableRooms: { [key: number]: ChatRoom };
 }

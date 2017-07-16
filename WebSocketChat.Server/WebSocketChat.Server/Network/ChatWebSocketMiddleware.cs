@@ -3,6 +3,8 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.WebSockets;
@@ -12,6 +14,7 @@ using System.Threading.Tasks;
 using WebSocketChat.Server.Common;
 using WebSocketChat.Server.Models.Chat;
 using WebSocketChat.Server.Models.Chat.Messages;
+using WebSocketChat.Server.Models.Chat.ThreadingHelper;
 
 namespace WebSocketChat.Server.Network
 {
@@ -19,11 +22,19 @@ namespace WebSocketChat.Server.Network
     {
         private static ConcurrentDictionary<string, ChatPartner> _sockets = new ConcurrentDictionary<string, ChatPartner>();
         private static ConcurrentDictionary<int, ChatRoom> _chatrooms = new ConcurrentDictionary<int, ChatRoom>();
+        private ChatRoom _globalRoom;
+        private IdentifierIncreaser _chatRoomIdentifierCounter = new IdentifierIncreaser();
 
         private readonly RequestDelegate _next;
 
         public ChatWebSocketMiddleware(RequestDelegate next)
         {
+            //create global room
+            _globalRoom = CreateNewChatRoom();
+            _globalRoom.Name = "Global Room";
+            _globalRoom.IsPrivateRoom = false;
+
+            _chatrooms.TryAdd(_globalRoom.RoomIdentifier, _globalRoom);
             _next = next;
         }
 
@@ -55,31 +66,55 @@ namespace WebSocketChat.Server.Network
                 {
                     break;
                 }
-                
+
+                string response = null;
+
                 try
                 {
-                    var response = await ReceiveStringAsync(currentSocket, ct);
+                    response = await ReceiveStringAsync(currentSocket, ct);
+                }
+                catch(WebSocketException ex)
+                {
+                    //the connection to the websocket is aborted, so we'll remove it from the server
+                    break;
+                }
+                catch(Exception ex)
+                {
+                    //catch other errors.. TODO: Logging
+                    break;
+                }
 
-                    if (string.IsNullOrEmpty(response))
+                if (string.IsNullOrEmpty(response))
+                {
+                    if (currentSocket.State != WebSocketState.Open)
                     {
-                        if (currentSocket.State != WebSocketState.Open)
-                        {
-                            break;
-                        }
-
-                        continue;
+                        break;
                     }
 
-                    await HandleMessage(response, socketId);
+                    continue;
                 }
-                catch{ }
+
+                await HandleMessage(response, socketId);
             }
 
-            _sockets.TryRemove(socketId, out dummy);
+            try
+            {
+                _sockets.TryRemove(socketId, out dummy);
 
-            await currentSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", ct);
-            currentSocket.Dispose();
-            await InformServerAboutLeave(socketId);
+                await currentSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", ct);
+                currentSocket.Dispose();
+                await InformServerAboutLeavingUser(socketId, 0);
+            }
+            catch(Exception ex )
+            {
+                //sometimes it can happen that the removal of the websocket fails
+            }
+            finally
+            {
+                //ensure that he his removed from all rooms and the global dictionary
+                RemoveUserFromAllChatRooms(socketId);
+                _sockets.TryRemove(socketId, out dummy);
+            }
         }
 
         /// <summary>
@@ -109,28 +144,95 @@ namespace WebSocketChat.Server.Network
                 {
                     //as long as rooms are not implemented, we can broadcast the message to the whole server
                     case MessageType.ChatMessage:
-                        await BroadcastString(jsonMessage.ToString());
+                        ChatMessage chatMessage = jsonMessage.ToObject<ChatMessage>();;
+
+                        await HandleChatMessage(socketId, chatMessage.RoomIdentifier, chatMessage.Recipient, jsonMessage.ToString());
+                    break;
+
+                    case MessageType.CreateRoomRequest:
+                        CreateRoomRequest roomRequest = jsonMessage.ToObject<CreateRoomRequest>();
+                        ChatRoom newRoom = CreateNewChatRoom(roomRequest.RequestedRoom);
+
+                        await InviteUsersToRoom(newRoom);
                     break;
 
                     case MessageType.NicknameRequest:
-                        NicknameRequest request = jsonMessage.ToObject<NicknameRequest>();
-                        request.WasSuccessful = false;
+                        NicknameRequest nameRequest = jsonMessage.ToObject<NicknameRequest>();
+                        nameRequest.WasSuccessful = false;
                         lock (_sockets)
                         {
-                            if (IsNicknameAvailable(request.RequestedNickname))
+                            if (IsNicknameAvailable(nameRequest.RequestedNickname))
                             {
-                                request.WasSuccessful = true;
-                                _sockets.FirstOrDefault(x => x.Key == socketId).Value.Nickname = request.RequestedNickname;
+                                nameRequest.WasSuccessful = true;
+                                _sockets.FirstOrDefault(x => x.Key == socketId).Value.Nickname = nameRequest.RequestedNickname;
                             }
                         }
 
-                        if(request.WasSuccessful)
+                        if(nameRequest.WasSuccessful)
                         {
-                            await BroadcastString(JsonConvert.SerializeObject(request, Global.SerializerSettings));
+                            await BroadcastString(JsonConvert.SerializeObject(nameRequest, Global.SerializerSettings));
                         }
                     break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Handles a chat message
+        /// </summary>
+        /// <param name="sender">GUID of the sender</param>
+        /// <param name="targetedRoom">identifier of the targeted room</param>
+        /// <param name="recipient">GUID of the recipient</param>
+        /// <param name="messageContent">The message itself</param>
+        /// <returns></returns>
+        private async Task HandleChatMessage(string sender, int? targetedRoom, string recipient, string messageContent)
+        {
+            ChatRoom targetRoom;
+            
+            //if the targeted room exists, send the message into it
+            if(targetedRoom.HasValue && _chatrooms.TryGetValue(targetedRoom.Value, out targetRoom))
+            {
+                //check whether the sender is in the room and if a recipient is set, he should also be in the room
+                if(targetRoom.ConnectedUsers.Contains(sender) && (recipient == null || targetRoom.ConnectedUsers.Contains(recipient)))
+                {
+                    await SendMessageIntoRoom(targetRoom, messageContent);
+                }
+            }
+            //if the targeted room is null and the recipient exists, it is a private message which room is not created yet
+            else if (!targetedRoom.HasValue && recipient != null && _sockets.TryGetValue(recipient, out ChatPartner dummy))
+            {
+                //check whether a room between them doesn't exist yet
+                targetRoom = _chatrooms.Values.FirstOrDefault(x => x.IsPrivateRoom && x.ConnectedUsers.Contains(sender) && x.ConnectedUsers.Contains(recipient));
+
+                if (targetRoom == null)
+                {
+                    targetRoom = CreateNewChatRoom();
+                    targetRoom.IsPrivateRoom = true;
+                    targetRoom.ConnectedUsers.Add(sender);
+                    targetRoom.ConnectedUsers.Add(recipient);
+
+                    //inform the two users about the new room
+                    await InviteUsersToRoom(targetRoom);
+                }
+
+                await SendMessageIntoRoom(targetRoom, messageContent);
+            }
+        }
+
+        /// <summary>
+        /// Invite users into a new chatroom
+        /// </summary>
+        /// <param name="room"></param>
+        /// <param name="userIdentifier"></param>
+        /// <returns></returns>
+        private async Task InviteUsersToRoom(ChatRoom room)
+        {
+            RoomInformationMessage message = new RoomInformationMessage();
+            message.ChatRoom = room;
+
+            string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
+
+            await SendMessageIntoRoom(room, serialized);
         }
 
         /// <summary>
@@ -148,6 +250,30 @@ namespace WebSocketChat.Server.Network
                 }
 
                 await SendStringAsync(socket.Value.WebSocket, message, CancellationToken.None);
+            }
+        }
+
+        /// <summary>
+        /// Send message into the whole room
+        /// </summary>
+        /// <param name="room"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private async Task SendMessageIntoRoom(ChatRoom room, string message)
+        {
+            List<ChatPartner> roomUsers = new List<ChatPartner>();
+
+            foreach (string userIdentifier in room.ConnectedUsers)
+            {
+                if(_sockets.TryGetValue(userIdentifier, out ChatPartner user))
+                {
+                    if (user.WebSocket.State != WebSocketState.Open)
+                    {
+                        continue;
+                    }
+
+                    await SendStringAsync(user.WebSocket, message, CancellationToken.None);
+                }
             }
         }
 
@@ -171,7 +297,9 @@ namespace WebSocketChat.Server.Network
                 _sockets.TryAdd(socketId, newChatPartner);
             }
 
-            UserIdentifierMessage joinMessage = new UserIdentifierMessage()
+            _globalRoom.ConnectedUsers.Add(newChatPartner.Identifier);
+
+            UserJoinMessage joinMessage = new UserJoinMessage()
             {
                 SenderGuid = socketId,
                 IsOriginOfMessage = false,
@@ -186,18 +314,39 @@ namespace WebSocketChat.Server.Network
         /// </summary>
         /// <param name="useridentifier"></param>
         /// <returns></returns>
-        private async Task InformServerAboutLeave(string useridentifier)
+        private async Task InformServerAboutLeavingUser(string useridentifier, int roomIdentifier)
         {
-            LeaveRoomMessage message = new LeaveRoomMessage()
+            UserLeaveMessage message = new UserLeaveMessage()
             {
-                RoomIdentifier = 0,
+                RoomIdentifier = roomIdentifier,
                 SenderGuid = useridentifier
             };
 
-            string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
-            foreach (var socket in _sockets)
+            //remove user from the room
+            ChatRoom room = _chatrooms[roomIdentifier];
+            room.ConnectedUsers.Remove(useridentifier);
+
+            //if it's the global room, it means that he left the whole server --> we'll remove him from all rooms
+            if(roomIdentifier == 0)
             {
-                await SendStringAsync(socket.Value.WebSocket, serialized, CancellationToken.None);
+                RemoveUserFromAllChatRooms(useridentifier);
+            }
+
+            //delete the room if it's empty (the global room can't be removed)
+            if(room.RoomIdentifier != 0 && room.ConnectedUsers.Count == 0)
+            {
+                ChatRoom dummy;
+                _chatrooms.TryRemove(room.RoomIdentifier, out dummy);
+            }
+
+            string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
+
+            foreach (var socketGuid in room.ConnectedUsers)
+            {
+                if(_sockets.TryGetValue(socketGuid, out ChatPartner user))
+                {
+                    await SendStringAsync(user.WebSocket, serialized, CancellationToken.None);
+                }
             }
         }
 
@@ -206,7 +355,7 @@ namespace WebSocketChat.Server.Network
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        private async Task InformServerAboutJoin(UserIdentifierMessage message)
+        private async Task InformServerAboutJoin(UserJoinMessage message)
         {
             //send the joining user his user name and all other users that he joined the server
             foreach (var socket in _sockets)
@@ -226,10 +375,44 @@ namespace WebSocketChat.Server.Network
         {
             ServerInformationMessage message = new ServerInformationMessage();
             message.UserDictionary = _sockets.ToDictionary(key => key.Key, value => value.Value);
+            message.AvailableRooms = _chatrooms.ToDictionary(key => key.Key, value => value.Value);
 
             string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
 
             await SendStringAsync(socket, serialized, CancellationToken.None);
+        }
+
+        /// <summary>
+        /// Create a new room thread-safe so that its identifier can't be used in multiple rooms at once
+        /// </summary>
+        /// <returns></returns>
+        private ChatRoom CreateNewChatRoom(ChatRoom template = null)
+        {
+            int identifier = -1;
+            lock (_chatRoomIdentifierCounter) {
+                identifier = _chatRoomIdentifierCounter.CurrentIdentifier;
+            }
+
+            ChatRoom room = template ?? new ChatRoom(identifier);
+            room.RoomIdentifier = identifier;
+
+            _chatrooms.TryAdd(identifier, room);
+            return room;
+        }
+
+        /// <summary>
+        /// Removes a specific user from all chat rooms
+        /// </summary>
+        /// <param name="userIdentifier"></param>
+        public void RemoveUserFromAllChatRooms(string userIdentifier)
+        {
+            foreach (var room in _chatrooms)
+            {
+                if (room.Value.ConnectedUsers.Contains(userIdentifier))
+                {
+                    room.Value.ConnectedUsers.Remove(userIdentifier);
+                }
+            }
         }
 
         #region Static Middleware Methods
@@ -243,9 +426,21 @@ namespace WebSocketChat.Server.Network
         /// <returns></returns>
         private static Task SendStringAsync(WebSocket socket, string data, CancellationToken cancellationToken = default(CancellationToken))
         {
-            var buffer = Encoding.UTF8.GetBytes(data);
-            var segment = new ArraySegment<byte>(buffer);
-            return socket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken);
+            try
+            {
+                if (socket.State == WebSocketState.Open)
+                {
+                    var buffer = Encoding.UTF8.GetBytes(data);
+                    var segment = new ArraySegment<byte>(buffer);
+                    return socket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken);
+                }
+            }
+            catch
+            {
+                //an exception could be thrown if the websocket is not available.. TODO: maybe we'll remove the target-websocket from the server
+            }
+
+            return null;
         }
 
         /// <summary>

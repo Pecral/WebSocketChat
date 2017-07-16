@@ -24,9 +24,9 @@ namespace WebSocketChat.Server.Models.Chat.Messages
         public string Recipient { get; set; }
 
         /// <summary>
-        /// If the message is sent in a chatroom, this message will be set
+        /// If the message is sent in a chatroom, this identifier will be set
         /// </summary>
-        public string Room { get; set; }
+        public int? RoomIdentifier { get; set; }
 
         /// <summary>
         /// Content of the message

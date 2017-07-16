@@ -14,6 +14,6 @@ namespace WebSocketChat.Server.Models.Chat.Messages
 
         public Dictionary<string, ChatPartner> UserDictionary { get; set; }
 
-        public List<ChatRoom> AvailableRooms { get; set; }
+        public Dictionary<int, ChatRoom> AvailableRooms { get; set; }
     }
 }

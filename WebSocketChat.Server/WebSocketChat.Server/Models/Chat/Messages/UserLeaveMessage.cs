@@ -5,11 +5,11 @@ using System.Threading.Tasks;
 
 namespace WebSocketChat.Server.Models.Chat.Messages
 {
-    public class LeaveRoomMessage : Message
+    public class UserLeaveMessage : Message
     {
-        public LeaveRoomMessage()
+        public UserLeaveMessage()
         {
-            MessageType = MessageType.LeaveRoom;
+            MessageType = MessageType.UserLeaveMessage;
             Timestamp = DateTime.Now;
         }
 

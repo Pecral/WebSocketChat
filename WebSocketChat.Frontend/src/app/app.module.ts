@@ -16,7 +16,10 @@ import { ChatMessageComponent } from './components/chat/message/chat-message.com
 import { ChatComponent } from './components/chat/chat.component';
 
 /** Services  */
-import { WebsocketService } from './shared/services/websocket-chat.service';
+import { ChatService } from './shared/services/websocket-chat.service';
+
+/** Pipes */
+import { MapPipe } from './shared/pipes/map.pipe';
 
 @NgModule({
   declarations: [
@@ -24,7 +27,9 @@ import { WebsocketService } from './shared/services/websocket-chat.service';
     ChatComponent,
     ChatMessageComponent,
     ChatRoomComponent,
-    ChatNotificationComponent
+    ChatNotificationComponent,
+
+    MapPipe
   ],
   imports: [
     BrowserModule,
@@ -35,7 +40,7 @@ import { WebsocketService } from './shared/services/websocket-chat.service';
     PanelModule,
     SplitPaneModule
   ],
-  providers: [WebsocketService],
+  providers: [ChatService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

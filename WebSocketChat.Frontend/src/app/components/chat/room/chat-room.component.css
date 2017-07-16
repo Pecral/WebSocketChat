@@ -1,0 +1,206 @@
+
+::selection{
+  background: rgba(82,179,217,0.3);
+  color: inherit;
+}
+
+.chat-app-wrapper {
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items: stretch;
+}
+
+/* M E N U */
+
+.chat-menu {
+    width: 100%;
+    padding-top: 4px;
+    padding-bottom: 7px;    
+    background: rgba(27,35,42,0.9);
+
+    z-index: 100;
+    order:1;
+    display:flex;
+    flex: 1 0 auto;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+.chat-menu.simple > div {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-menu.simple div  {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.menu-back {
+    flex: 0 0 100px;
+    white-space: nowrap;
+}
+
+.back {
+    height: 50px;
+    color: rgba(255,255,255,0.5);
+    line-height: 45px;
+    font-size: 40px;
+    padding-left: 10px;
+    cursor: pointer;
+    transition: .15s all;
+}
+
+.back:hover, .back:focus {
+    text-decoration: none;
+}
+
+.back:before {
+    position: absolute;
+    bottom: 0px;
+    left: 0;
+    visibility: hidden;
+    width: 111px;
+    height: 1px;
+    content: '';
+    transition: all .2s ease-in-out 0s;
+    -webkit-transform: scaleX(0);
+    transform: scaleX(0);
+    background-color: #aaaaaa;
+}
+
+.back:hover:before {
+    visibility: visible;
+    -webkit-transform: scaleX(1);
+    transform: scaleX(1)
+}
+
+.back img {
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 100%;
+    -webkit-border-radius: 100%;
+    -moz-border-radius: 100%;
+    -ms-border-radius: 100%;
+    margin-left: 15px;
+}
+
+.back:active {
+    background: rgba(0,0,0,0.15);
+}
+
+.name {
+    /*left: 110px;*/
+    font-family: 'Lato';
+    font-size: 20px;
+    font-weight: 300;
+    color: rgba(255,255,255,0.98);
+    cursor: default;
+}
+
+.last {
+    font-family: 'Lato';
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.6);
+    cursor: default;
+}
+
+.members {
+    font-family: 'Lato';
+    font-size: 11px;
+    font-weight: 400;
+    color: rgba(255,255,255,0.6);
+    cursor: default;
+    word-spacing: 2px;
+}
+
+/* M E S S A G E S */
+
+.chat-messages {
+    overflow-x:hidden;
+    overflow-y:scroll;
+    height:100%;
+    order: 2;
+}
+
+.chat {
+    list-style: none;
+    background: none;
+    margin: 0;
+    padding: 0 0 50px 0;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.chat chat-notification {
+    display: flex;
+}
+
+.chat chat-message {
+    padding: 0.5rem 1rem;
+    overflow: hidden;
+    display: flex;
+}
+
+/* T Y P E */
+
+.chat-input {
+    order: 3;
+    flex: 0 0 45px;
+    width: 100%;
+    height: 50px;
+    z-index: 99;
+    background: #fafafa;
+    border: none;
+    outline: none;
+    padding-left: 10px;
+    padding-right: 55px;
+    color: #666;
+    font-weight: 400;
+}
+
+
+/* R E S P O N S I V E   C O N F I G U R A T I O N
+
+ */
+
+@media screen and (max-width: 750px) {
+
+    ::-webkit-scrollbar {
+    display: none;
+    }
+    .chat{
+        margin-bottom: 55px;
+    }
+    .chat .notification {
+        font-size: 12px;
+        margin: 7px 30%;
+        width: 40%;
+    }
+    .chat .day {
+        font-size: 11px;
+    }
+
+    .send {
+        width: 25%;
+    }
+
+}
+@media screen and (max-width: 550px) {
+    .chat .notification {
+        font-size: 12px;
+        margin: 7px 0px;
+        width: 100%;
+        border-radius: 0px;
+    }
+    .chat .notification time {
+        right: 10px;
+    }
+}

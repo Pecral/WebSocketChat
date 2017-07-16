@@ -1,5 +1,5 @@
-import { ChatMessage } from './../../../shared/models/chat/messages/chat-message';
 import { Component, OnInit, Input } from '@angular/core';
+import { ChatMessage } from './../../../shared/models/chat/messages/chat-message';
 
 @Component({
   selector: 'chat-message',
@@ -12,7 +12,7 @@ export class ChatMessageComponent implements OnInit {
   message : ChatMessage;
 
   @Input()
-  /** Identifier guid of yourself */
+  /** Our own identifier guid  */
   identifier : string;
 
   constructor() { }

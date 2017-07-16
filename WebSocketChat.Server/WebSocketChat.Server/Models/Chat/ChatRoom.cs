@@ -8,15 +8,31 @@ namespace WebSocketChat.Server.Models.Chat
 {
     public class ChatRoom
     {
-        public ChatRoom()
+        public ChatRoom(int roomIdentifier)
         {
+            RoomIdentifier = roomIdentifier;
             ConnectedUsers = new List<string>();
         }
+
+        private int _roomIdentifier = -1;
 
         /// <summary>
         /// Identifier of the room. The number 0 indicates the global server room.
         /// </summary>
-        public int RoomIdentifier { get; set; }
+        public int RoomIdentifier {
+            get
+            {
+                return _roomIdentifier;
+            }
+            set
+            {
+                //identifier can only be set once
+                if(_roomIdentifier == -1)
+                {
+                    _roomIdentifier = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Name of the chatroom

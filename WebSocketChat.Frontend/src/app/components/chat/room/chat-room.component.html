@@ -1,3 +1,24 @@
-<p>
-  chat-room works!
-</p>
+<div class="chat-app-wrapper">
+  <div class="chat-menu container-fluid {{(detailedMenu ? 'detailed' : 'simple')}}" (click)="detailedMenu = !detailedMenu">
+      <div class="menu-back">
+        <a href="#" class="back"><i class="fa fa-angle-left"></i> <img src="https://i.imgur.com/G4EjwqQ.jpg" draggable="false"/></a>
+      </div>
+      <div class="">
+        <div class="name">Random chat</div>
+        <div class="members">
+          <b>{{this.selfIdentifier.nickname}}</b>{{this.chatRoom.nicknameStringAggregation}}
+        </div>
+      </div>
+  </div>
+  <div #chatWrapper class="chat-messages">
+    <ol class="chat">
+      <li *ngFor="let message of chatRoom.messages">
+        <chat-message *ngIf="message.messageType == messageType.ChatMessage;else notificationMessage" class="chat-message {{((message.senderGuid == selfIdentifier.identifier) ? 'self' : 'other')}}"
+          [message]="message" [identifier]="selfIdentifier.identifier"></chat-message>
+        <ng-template #notificationMessage><chat-notification [notificationMessage]="message"></chat-notification></ng-template>
+      </li>
+    </ol>
+  </div>
+  <input class="chat-input" type="text" placeholder="Type here!" [(ngModel)]="currentMessage" (keyup.enter)="sendMessage(currentMessage)" />
+</div>
+<!--<div class="emojis"></div>-->

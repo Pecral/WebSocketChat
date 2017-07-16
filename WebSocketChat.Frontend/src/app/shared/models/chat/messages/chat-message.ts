@@ -12,5 +12,5 @@ export class ChatMessage extends MessageIdentifier implements Message {
   message : string;
   
   /** The room where the message was posted */
-  room : string;
+  roomIdentifier : number;
 }

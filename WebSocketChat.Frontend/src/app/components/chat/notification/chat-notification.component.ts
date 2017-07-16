@@ -4,8 +4,8 @@ import { Component, OnInit, Input } from '@angular/core';
 /** Models */
 import { NicknameRequest } from './../../../shared/models/chat/messages/nickname-request';
 import { MessageType } from './../../../shared/models/chat/message-type';
-import { LeaveRoomMessage } from './../../../shared/models/chat/messages/user-leave-message';
-import { UserIdentifierMessage } from './../../../shared/models/chat/messages/user-identifier-message';
+import { UserLeaveMessage } from './../../../shared/models/chat/messages/user-leave-message';
+import { UserJoinMessage } from './../../../shared/models/chat/messages/user-join-message';
 import { Message } from "./../../../shared/models/chat/message";
 
 @Component({
@@ -16,7 +16,7 @@ import { Message } from "./../../../shared/models/chat/message";
 export class ChatNotificationComponent implements OnInit {
 
   @Input()
-  notificationMessage : UserIdentifierMessage | LeaveRoomMessage | NicknameRequest;
+  notificationMessage : UserJoinMessage | UserLeaveMessage | NicknameRequest;
 
   constructor() { }
 
@@ -35,10 +35,10 @@ export class ChatNotificationComponent implements OnInit {
 
   /** Returns the notification message based on the type of the notification  */
   getMessage(): string {
-    if(this.notificationMessage instanceof UserIdentifierMessage) {
+    if(this.notificationMessage instanceof UserJoinMessage) {
       return "has joined the server."
     }
-    else if(this.notificationMessage instanceof (LeaveRoomMessage)) {
+    else if(this.notificationMessage instanceof (UserLeaveMessage)) {
       if(this.notificationMessage.roomIdentifier != 0) {
         return "has left the room."
       }

@@ -39,3 +39,7 @@
     -ms-user-select: none;
     transition: all .2s cubic-bezier(0.565, -0.260, 0.255, 1.410);
 }
+
+.notification .content {
+    padding-right: 15px;
+}

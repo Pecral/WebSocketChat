@@ -58,20 +58,30 @@ namespace WebSocketChat.Server.Network
             var socketId = Guid.NewGuid().ToString();
 
             await AcceptNewUser(currentSocket, socketId);
-            await SendServerInformationToUser(currentSocket);
+            await SendServerInformationToUser(currentSocket, socketId);
 
-            while (true)
+            while (currentSocket.State == WebSocketState.Open)
             {
                 if (ct.IsCancellationRequested)
                 {
                     break;
                 }
 
-                string response = null;
-
                 try
                 {
-                    response = await ReceiveStringAsync(currentSocket, ct);
+                    string response = await ReceiveStringAsync(currentSocket, ct);
+
+                    if (string.IsNullOrEmpty(response))
+                    {
+                        if (currentSocket.State != WebSocketState.Open)
+                        {
+                            break;
+                        }
+
+                        continue;
+                    }
+
+                    await HandleMessage(response, socketId);
                 }
                 catch(WebSocketException ex)
                 {
@@ -83,37 +93,21 @@ namespace WebSocketChat.Server.Network
                     //catch other errors.. TODO: Logging
                     break;
                 }
+            }
 
-                if (string.IsNullOrEmpty(response))
+            //if we reach this point, it means that the websocket to the user is closed
+            //it could be the case that we wanted to connect it from another thread but it did not respond, so we've already removed it from the socket-dictionary
+            //that's why we have to check whether it still exists first
+            if(_sockets.ContainsKey(socketId))
+            {
+                try
                 {
-                    if (currentSocket.State != WebSocketState.Open)
-                    {
-                        break;
-                    }
-
-                    continue;
+                    await DisconnectUserFromServer(socketId);
                 }
-
-                await HandleMessage(response, socketId);
-            }
-
-            try
-            {
-                _sockets.TryRemove(socketId, out dummy);
-
-                await currentSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", ct);
-                currentSocket.Dispose();
-                await InformServerAboutLeavingUser(socketId, 0);
-            }
-            catch(Exception ex )
-            {
-                //sometimes it can happen that the removal of the websocket fails
-            }
-            finally
-            {
-                //ensure that he his removed from all rooms and the global dictionary
-                RemoveUserFromAllChatRooms(socketId);
-                _sockets.TryRemove(socketId, out dummy);
+                catch (Exception ex)
+                {
+                    //the removal of the websocket fails sometimes
+                }
             }
         }
 
@@ -170,7 +164,7 @@ namespace WebSocketChat.Server.Network
 
                         if(nameRequest.WasSuccessful)
                         {
-                            await BroadcastString(JsonConvert.SerializeObject(nameRequest, Global.SerializerSettings));
+                            await SendMessageIntoRoom(_globalRoom, JsonConvert.SerializeObject(nameRequest, Global.SerializerSettings));
                         }
                     break;
                 }
@@ -236,24 +230,6 @@ namespace WebSocketChat.Server.Network
         }
 
         /// <summary>
-        /// Broadcast a string to the whole server.
-        /// </summary>
-        /// <param name="message"></param>
-        /// <returns></returns>
-        private async Task BroadcastString(string message)
-        {
-            foreach (var socket in _sockets)
-            {
-                if (socket.Value.WebSocket.State != WebSocketState.Open)
-                {
-                    continue;
-                }
-
-                await SendStringAsync(socket.Value.WebSocket, message, CancellationToken.None);
-            }
-        }
-
-        /// <summary>
         /// Send message into the whole room
         /// </summary>
         /// <param name="room"></param>
@@ -261,20 +237,17 @@ namespace WebSocketChat.Server.Network
         /// <returns></returns>
         private async Task SendMessageIntoRoom(ChatRoom room, string message)
         {
-            List<ChatPartner> roomUsers = new List<ChatPartner>();
+            List<string> usersCopy = room.ConnectedUsers.ToList();
 
-            foreach (string userIdentifier in room.ConnectedUsers)
+            await Task.WhenAll(usersCopy.Select(userIdentifier =>
             {
-                if(_sockets.TryGetValue(userIdentifier, out ChatPartner user))
+                if (_sockets.TryGetValue(userIdentifier, out ChatPartner user))
                 {
-                    if (user.WebSocket.State != WebSocketState.Open)
-                    {
-                        continue;
-                    }
-
-                    await SendStringAsync(user.WebSocket, message, CancellationToken.None);
+                    return SendStringAsync(user.WebSocket, userIdentifier, message, CancellationToken.None);
                 }
-            }
+
+                return Task.CompletedTask;
+            }).ToArray());
         }
 
         /// <summary>
@@ -340,14 +313,7 @@ namespace WebSocketChat.Server.Network
             }
 
             string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
-
-            foreach (var socketGuid in room.ConnectedUsers)
-            {
-                if(_sockets.TryGetValue(socketGuid, out ChatPartner user))
-                {
-                    await SendStringAsync(user.WebSocket, serialized, CancellationToken.None);
-                }
-            }
+            await SendMessageIntoRoom(room, serialized);
         }
 
         /// <summary>
@@ -358,20 +324,20 @@ namespace WebSocketChat.Server.Network
         private async Task InformServerAboutJoin(UserJoinMessage message)
         {
             //send the joining user his user name and all other users that he joined the server
-            foreach (var socket in _sockets)
+            await Task.WhenAll(_sockets.Select(socket =>
             {
                 message.IsOriginOfMessage = socket.Key == message.SenderGuid;
                 string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
 
-                await SendStringAsync(socket.Value.WebSocket, serialized, CancellationToken.None);
-            }
+                return SendStringAsync(socket.Value.WebSocket, socket.Key, serialized, CancellationToken.None);
+            }).ToArray());
         }
 
         /// <summary>
         /// Send server information to current chat partner
         /// </summary>
         /// <returns></returns>
-        private async Task SendServerInformationToUser(WebSocket socket)
+        private async Task SendServerInformationToUser(WebSocket socket, string socketIdentifier)
         {
             ServerInformationMessage message = new ServerInformationMessage();
             message.UserDictionary = _sockets.ToDictionary(key => key.Key, value => value.Value);
@@ -379,7 +345,7 @@ namespace WebSocketChat.Server.Network
 
             string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
 
-            await SendStringAsync(socket, serialized, CancellationToken.None);
+            await SendStringAsync(socket, socketIdentifier, serialized, CancellationToken.None);
         }
 
         /// <summary>
@@ -415,7 +381,22 @@ namespace WebSocketChat.Server.Network
             }
         }
 
-        #region Static Middleware Methods
+        /// <summary>
+        /// Closes the user's websocket, removes him from the server and informs the other users that he is disconnected
+        /// </summary>
+        /// <param name="userIdentifier"></param>
+        /// <returns></returns>
+        public async Task DisconnectUserFromServer(string userIdentifier)
+        {
+            if(_sockets.TryRemove(userIdentifier, out ChatPartner user))
+            {
+                RemoveUserFromAllChatRooms(userIdentifier);
+                await user.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                user.WebSocket.Dispose();
+                
+                await InformServerAboutLeavingUser(userIdentifier, 0);
+            }
+        }
 
         /// <summary>
         /// Pass string into a websocket
@@ -424,7 +405,7 @@ namespace WebSocketChat.Server.Network
         /// <param name="data"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private static Task SendStringAsync(WebSocket socket, string data, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task SendStringAsync(WebSocket socket, string socketIdentifier, string data, CancellationToken cancellationToken = default(CancellationToken))
         {
             try
             {
@@ -432,15 +413,14 @@ namespace WebSocketChat.Server.Network
                 {
                     var buffer = Encoding.UTF8.GetBytes(data);
                     var segment = new ArraySegment<byte>(buffer);
-                    return socket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken);
+                    await socket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken);
                 }
             }
             catch
             {
-                //an exception could be thrown if the websocket is not available.. TODO: maybe we'll remove the target-websocket from the server
+                //an exception could be thrown if the websocket is not available.. we'll disconnect him then
+                await DisconnectUserFromServer(socketIdentifier);
             }
-
-            return null;
         }
 
         /// <summary>
@@ -449,7 +429,7 @@ namespace WebSocketChat.Server.Network
         /// <param name="socket"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private static async Task<string> ReceiveStringAsync(WebSocket socket, CancellationToken cancellationToken = default(CancellationToken))
+        private async Task<string> ReceiveStringAsync(WebSocket socket, CancellationToken cancellationToken = default(CancellationToken))
         {
             var buffer = new ArraySegment<byte>(new byte[8192]);
             using (var memoryStream = new MemoryStream())
@@ -477,6 +457,8 @@ namespace WebSocketChat.Server.Network
                 }
             }
         }
+
+        #region Static Middleware Methods
 
         /// <summary>
         /// Returns a new nickname for a connecting user.

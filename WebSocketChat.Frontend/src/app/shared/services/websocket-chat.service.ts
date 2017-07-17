@@ -149,29 +149,28 @@ export class ChatService {
 
    /** Handle message which informs us that a specific user has left */
    private handleLeavingUser(message: UserLeaveMessage):void {
+      let removeUserFromRoom = (room: ChatRoom) => {
+            //remove user from room
+            let userIndex = room.connectedUsers.indexOf(message.senderGuid);
+            room.connectedUsers.splice(userIndex, 1);
+
+            this.addMessageToRoom(room.roomIdentifier, message);
+            this.updateNicknameStringAggregation(room.roomIdentifier);
+      }
+
       //if the user has left the server, remove the user from all rooms
       if(message.roomIdentifier == this.globalRoom.roomIdentifier) {
          this.roomDictionary.forEach((value: ChatRoom, key: number) => {
-            //remove user from room
-            let userIndex = value.connectedUsers.indexOf(message.senderGuid);
-            value.connectedUsers.splice(userIndex);
-
-            this.addMessageToRoom(value.roomIdentifier, message);
-            this.updateNicknameStringAggregation(value.roomIdentifier);
+            removeUserFromRoom(value);
          });
 
          //remove from user dictionary
          this.userDictionary.delete(message.senderGuid);
-
       }
       else {
          //remove user from room
          let room = this.roomDictionary.get(message.roomIdentifier);
-         let userIndex = room.connectedUsers.indexOf(message.senderGuid);
-         room.connectedUsers.splice(userIndex);
-
-         this.addMessageToRoom(message.roomIdentifier, message);
-         this.updateNicknameStringAggregation(message.roomIdentifier);
+         removeUserFromRoom(room);
       }
    }
 
@@ -211,7 +210,7 @@ export class ChatService {
       }
    }      
 
-   /** Updates the aggregatio-string of all nicknames which are currently connected to the room/server */
+   /** Updates the aggregation-string of all nicknames which are currently connected to the room/server */
    private updateNicknameStringAggregation(room:number):void {
       if(this.roomDictionary.has(room)) {
          let roomInstance = this.roomDictionary.get(room);

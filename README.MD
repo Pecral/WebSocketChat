@@ -2,17 +2,18 @@
 
 This project is a typical chat web-application which uses WebSockets to communicate between the frontend (using Angular 4) and the backend (using .NET Core).
 
-### Requirements
+## Requirements
 * Standalone [.NET Core SDK](https://www.microsoft.com/net/download/core) or alternatively  [Visual Studio 2017](https://www.visualstudio.com/downloads/).
 * node package manager (NPM), part of [node.js](https://nodejs.org/en/).
+* [Angular CLI](https://www.npmjs.com/package/@angular/cli) -> install with `npm install -g @angular/cli`
 
-### Backend Usage
+## Backend Usage
 1. Navigate to .NET Core backend project in `./WebSocketChat.Server/WebSocketChatServer`.
 2. Restore packages with `dotnet restore` and start local server with `dotnet run`.
 
 or..
 
-1. Open the backend project in VS2017, wait till the NuGet packages are restored and start the IIS-Express server with F5.
+1. Open server solution in VS2017, wait till the NuGet packages are restored and start the IIS-Express server with F5.
 
 ## Frontend Usage
 1. Navigate to `./WebSocketChat.Frontend`

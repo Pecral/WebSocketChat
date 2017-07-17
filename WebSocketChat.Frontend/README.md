@@ -1,10 +1,6 @@
-# WebSocketChat.Frontend
+# WebSocket URL Configuration
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.2.0.
-
-# Backend Websocket Configuration
-
-You may have to configure the IP and port to which the websocket will connect in the environment files.
+You may have to configure the IP and port to which the websocket will connect -> `./src/environments/environment.prod.ts` -> property `websocketBaseUrl` (you can see the url of your server in the command-line if you've started it with `dotnet run`). The suffix `/chat` shouldn't be changed.
 
 ## Development server
 
@@ -22,7 +18,3 @@ Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.
 
 Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
 Before running the tests make sure you are serving the app via `ng serve`.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).

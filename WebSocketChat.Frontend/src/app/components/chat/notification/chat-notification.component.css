@@ -21,6 +21,16 @@
     -ms-user-select: none;
     transition: all .2s cubic-bezier(0.565, -0.260, 0.255, 1.410);
 }
+
+@media (max-width: 315px) {
+    .notification {
+        min-width: 98%;
+        width: 98%;
+        text-align: left;
+        padding-left: 9px;
+    }
+}
+
 .notification time {
     position: absolute;
     top: 7px;

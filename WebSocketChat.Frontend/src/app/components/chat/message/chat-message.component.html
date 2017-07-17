@@ -2,7 +2,9 @@
   <div *ngIf="(message.senderGuid != identifier)" class="avatar"><img [src]="message.avatarSourceUrl" draggable="false" /></div>
   <div class="msg">
     <div *ngIf="(message.senderGuid != identifier)" class="user">{{message.senderName}}</div>
-    <p>{{message.message}}</p>
+    <div class="message-text">
+      <p>{{message.message}}</p>
+    </div>
     <time>{{message.timestamp.toLocaleTimeString()}}</time>
   </div>
 </div>

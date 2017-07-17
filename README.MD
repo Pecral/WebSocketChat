@@ -1,24 +1,21 @@
-# WebSocketChat.Frontend
+# WebSocketChat
 
-The frontend-project was initially generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.2.0.
+This project is a typical chat web-application which uses WebSockets to communicate between the frontend (using Angular 4) and the backend (using .NET Core).
 
-# Backend Websocket Configuration
+### Requirements
+* Standalone [.NET Core SDK](https://www.microsoft.com/net/download/core) or alternatively  [Visual Studio 2017](https://www.visualstudio.com/downloads/).
+* node package manager (NPM), part of [node.js](https://nodejs.org/en/).
 
-You may have to configure the IP and port to which the websocket will connect in the environment files.
+### Backend Usage
+1. Navigate to .NET Core backend project in `./WebSocketChat.Server/WebSocketChatServer`.
+2. Restore packages with `dotnet restore` and start local server with `dotnet run`.
 
-## Development server
+or..
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+1. Open the backend project in VS2017, wait till the NuGet packages are restored and start the IIS-Express server with F5.
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-Before running the tests make sure you are serving the app via `ng serve`.
+## Frontend Usage
+1. Navigate to `./WebSocketChat.Frontend`
+2. Install required node modules with `npm install`
+3. Configure URL to connect to your running backend server in `./WebSocketChat.Frontend/src/environments/environment.prod.ts` -> property `websocketBaseUrl` (you can see the url of your server in the command-line if you've started it with `dotnet run`). The suffix `/chat` shouldn't be changed.
+4. Run `ng serve` for a dev server. Navigate to `http://localhost:4200/` to open the application. The app will automatically reload if you change any of the source files.

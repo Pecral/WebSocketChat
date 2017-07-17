@@ -134,9 +134,7 @@
     list-style: none;
     background: none;
     margin: 0;
-    padding: 0 0 50px 0;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    padding: 10px 0 10px 0; 
 }
 
 .chat chat-notification {
@@ -176,9 +174,7 @@
     ::-webkit-scrollbar {
     display: none;
     }
-    .chat{
-        margin-bottom: 55px;
-    }
+
     .chat .notification {
         font-size: 12px;
         margin: 7px 30%;

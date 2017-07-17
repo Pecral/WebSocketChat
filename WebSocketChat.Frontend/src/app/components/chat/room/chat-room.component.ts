@@ -1,3 +1,4 @@
+import { NgxAutoScroll } from 'ngx-auto-scroll/lib/ngx-auto-scroll.directive';
 import { ChatUser } from './../../../shared/models/chat/chat-user';
 import { ChatMessage } from './../../../shared/models/chat/messages/chat-message';
 import { NicknameRequest } from './../../../shared/models/chat/messages/nickname-request';
@@ -7,37 +8,36 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 
 @Component({
-  selector: 'chat-room',
-  templateUrl: './chat-room.component.html',
-  styleUrls: ['./chat-room.component.css']
+   selector: 'chat-room',
+   templateUrl: './chat-room.component.html',
+   styleUrls: ['./chat-room.component.css']
 })
 export class ChatRoomComponent implements OnInit {
 
-  @Output()
-  messageSend : EventEmitter<ChatMessage | NicknameRequest> = new EventEmitter<ChatMessage | NicknameRequest>();
+   @Output()
+   messageSend: EventEmitter<ChatMessage | NicknameRequest> = new EventEmitter<ChatMessage | NicknameRequest>();
 
-  @Input()
-  chatRoom : ChatRoom;
+   @Input()
+   chatRoom: ChatRoom;
 
-  @Input()
-  selfIdentifier : ChatUser = new ChatUser();
+   @Input()
+   selfIdentifier: ChatUser = new ChatUser();
 
-  /** proxy so that we can access the enum in our html-file */
-  messageType : any = MessageType;
+   /** proxy so that we can access the enum in our html-file */
+   messageType: any = MessageType;
 
-  currentMessage: string;
+   currentMessage: string;
 
-  /** Indicates whether the menu should be in its detailed mode where all nicknames which exist in the room are displayed */
-  detailedMenu: boolean;
-  
-  constructor() { }
+   /** Indicates whether the menu should be in its detailed mode where all nicknames which exist in the room are displayed */
+   detailedMenu: boolean;
 
-  ngOnInit() {
-  }
+   constructor() { }
+
+   ngOnInit() { }
 
    /** Send a new chat message to the server */
    public sendMessage(message: string) {
-      if(message && message != "") {
+      if (message && message != "") {
          if (message.toLowerCase().startsWith("/identify")) {
             let whitespaceIndex = message.indexOf(" ");
             let nickname = message.substring(whitespaceIndex, message.length);
@@ -61,6 +61,6 @@ export class ChatRoomComponent implements OnInit {
 
       //clear current message in input field
       this.currentMessage = "";
-   }  
+   }
 
 }

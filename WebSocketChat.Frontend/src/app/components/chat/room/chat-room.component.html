@@ -10,7 +10,7 @@
         </div>
       </div>
   </div>
-  <div #chatWrapper class="chat-messages">
+  <div #chatWrapper class="chat-messages" ngx-auto-scroll>
     <ol class="chat">
       <li *ngFor="let message of chatRoom.messages">
         <chat-message *ngIf="message.messageType == messageType.ChatMessage;else notificationMessage" class="chat-message {{((message.senderGuid == selfIdentifier.identifier) ? 'self' : 'other')}}"

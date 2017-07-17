@@ -7,6 +7,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 /** 3rd Party */
 import { SplitPaneModule } from 'ng2-split-pane/lib/ng2-split-pane';
 import { AccordionModule, PanelModule } from 'primeng/primeng';
+import { NgxAutoScroll } from 'ngx-auto-scroll/lib/ngx-auto-scroll.directive';
 
 /** Components */
 import { AppComponent } from './app.component';
@@ -23,13 +24,18 @@ import { MapPipe } from './shared/pipes/map.pipe';
 
 @NgModule({
   declarations: [
+    /** Components */
     AppComponent,
     ChatComponent,
     ChatMessageComponent,
     ChatRoomComponent,
     ChatNotificationComponent,
 
-    MapPipe
+    /** Pipes */
+    MapPipe,
+    
+    /** Directives */
+    NgxAutoScroll
   ],
   imports: [
     BrowserModule,

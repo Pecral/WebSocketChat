@@ -35,17 +35,6 @@ export class ChatComponent implements OnInit {
       });
    }
 
-   /** Scroll to the last chat message  */
-   scrollToBottom(): void {
-      // $('.chat-messages').animate({
-      // 	scrollTop:$('.chat li:last').offset().top
-      // }, 300);
-
-      // try {
-      // 	this.chatWrapper.nativeElement.scrollTop = this.chatWrapper.nativeElement.scrollHeight;
-      // } catch (err) { }
-   }
-
    /** Proxy method to pass messages to the webservice */
    sendMessage(message: ChatMessage | NicknameRequest):void {
       if(message instanceof ChatMessage || this.isNicknameAvailable(message.requestedNickname)) {

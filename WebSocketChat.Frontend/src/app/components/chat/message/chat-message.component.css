@@ -115,12 +115,11 @@
 }
 .msg time:before{
     content:"\f00c";
-    color: #ddd;
+    color: #73b5ca;
     font-family: FontAwesome;
     display: inline-block;
     margin-right: 4px;
 }
-
 
 /* R E S P O N S I V E   C O N F I G U R A T I O N */
 
@@ -166,9 +165,11 @@
     .msg p {
         font-size: 11px;
     }
+
     .msg .user {
         font-size: 13px;
     }
+    
     .msg img {
         width: 300px;
     }

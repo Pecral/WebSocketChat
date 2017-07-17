@@ -66,13 +66,8 @@ namespace WebSocketChat.Server.Network
             await AcceptNewUser(currentSocket, socketId);
             await SendServerInformationToUser(currentSocket, socketId);
 
-            while (currentSocket.State == WebSocketState.Open)
+            while (currentSocket.State == WebSocketState.Open && !ct.IsCancellationRequested)
             {
-                if (ct.IsCancellationRequested)
-                {
-                    break;
-                }
-
                 try
                 {
                     string response = await ReceiveStringAsync(currentSocket, ct);

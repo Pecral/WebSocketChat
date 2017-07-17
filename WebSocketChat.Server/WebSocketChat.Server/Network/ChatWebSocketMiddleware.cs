@@ -24,6 +24,12 @@ namespace WebSocketChat.Server.Network
         private static ConcurrentDictionary<int, ChatRoom> _chatrooms = new ConcurrentDictionary<int, ChatRoom>();
         private ChatRoom _globalRoom;
         private IdentifierIncreaser _chatRoomIdentifierCounter = new IdentifierIncreaser();
+        private Object _userRemovalLockObject = new object();
+
+        /// <summary>
+        /// List of users which are currently disconnecting (if alot of users disconnect simultaneously, we need this list to check whether the leaving user is already handled)
+        /// </summary>
+        private List<string> _queuedUsersToDisconnect = new List<string>();
 
         private readonly RequestDelegate _next;
 
@@ -283,37 +289,44 @@ namespace WebSocketChat.Server.Network
         }
 
         /// <summary>
+        /// Handles the action that a user leaves a room
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        private async Task HandleUserLeavingRoom(UserLeaveMessage message)
+        {
+            ChatRoom room = _chatrooms[message.RoomIdentifier];
+            //remove user from the room
+            lock (_userRemovalLockObject)
+            {
+                room.ConnectedUsers.Remove(message.SenderGuid);
+            }
+
+            //delete the room if it's empty (the global room can't be removed)
+            if (room.RoomIdentifier != 0 && room.ConnectedUsers.Count == 0)
+            {
+                ChatRoom dummy;
+                lock(_userRemovalLockObject)
+                {
+                    _chatrooms.TryRemove(room.RoomIdentifier, out dummy);
+                }   
+            }
+
+            await InformServerAboutLeavingUser(message);
+        }
+
+        /// <summary>
         /// Inform all users that a specific user has left a room/the server
         /// </summary>
         /// <param name="useridentifier"></param>
         /// <returns></returns>
-        private async Task InformServerAboutLeavingUser(string useridentifier, int roomIdentifier)
+        private async Task InformServerAboutLeavingUser(UserLeaveMessage message)
         {
-            UserLeaveMessage message = new UserLeaveMessage()
+            if(_chatrooms.TryGetValue(message.RoomIdentifier, out ChatRoom room))
             {
-                RoomIdentifier = roomIdentifier,
-                SenderGuid = useridentifier
-            };
-
-            //remove user from the room
-            ChatRoom room = _chatrooms[roomIdentifier];
-            room.ConnectedUsers.Remove(useridentifier);
-
-            //if it's the global room, it means that he left the whole server --> we'll remove him from all rooms
-            if(roomIdentifier == 0)
-            {
-                RemoveUserFromAllChatRooms(useridentifier);
+                string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
+                await SendMessageIntoRoom(room, serialized);
             }
-
-            //delete the room if it's empty (the global room can't be removed)
-            if(room.RoomIdentifier != 0 && room.ConnectedUsers.Count == 0)
-            {
-                ChatRoom dummy;
-                _chatrooms.TryRemove(room.RoomIdentifier, out dummy);
-            }
-
-            string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
-            await SendMessageIntoRoom(room, serialized);
         }
 
         /// <summary>
@@ -388,13 +401,50 @@ namespace WebSocketChat.Server.Network
         /// <returns></returns>
         public async Task DisconnectUserFromServer(string userIdentifier)
         {
-            if(_sockets.TryRemove(userIdentifier, out ChatPartner user))
+            bool proceedWithDisconnect = false;
+            ChatPartner user = null;
+            lock (_userRemovalLockObject) {
+                //the socket still has to be in our socket-dictionary and shouldn't be in the list of currently disconnecting users
+                if(_sockets.TryRemove(userIdentifier, out user) && !_queuedUsersToDisconnect.Contains(userIdentifier))
+                {
+                    _queuedUsersToDisconnect.Add(userIdentifier);
+                    proceedWithDisconnect = true;
+                }
+                else
+                {
+                    _queuedUsersToDisconnect.Remove(userIdentifier);
+                }
+            }
+            
+            if(proceedWithDisconnect)
             {
-                RemoveUserFromAllChatRooms(userIdentifier);
-                await user.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                user.WebSocket.Dispose();
-                
-                await InformServerAboutLeavingUser(userIdentifier, 0);
+                try
+                {
+                    lock (_userRemovalLockObject)
+                    {
+                        RemoveUserFromAllChatRooms(userIdentifier);
+                        Task closeTask = user.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                        closeTask.Wait();
+                        user.WebSocket.Dispose();
+                    }
+                }
+                catch(Exception ex)
+                {
+                    //catch errors (if the closing of the socket fails)
+                }
+
+                UserLeaveMessage message = new UserLeaveMessage()
+                {
+                    RoomIdentifier = _globalRoom.RoomIdentifier,
+                    SenderGuid = userIdentifier
+                };
+
+                await InformServerAboutLeavingUser(message);
+
+                lock(_userRemovalLockObject)
+                {
+                    _queuedUsersToDisconnect.Remove(userIdentifier);
+                }
             }
         }
 
@@ -411,15 +461,25 @@ namespace WebSocketChat.Server.Network
             {
                 if (socket.State == WebSocketState.Open)
                 {
-                    var buffer = Encoding.UTF8.GetBytes(data);
-                    var segment = new ArraySegment<byte>(buffer);
-                    await socket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken);
+                    //Temporary WORKAROUND! A websocket should only be accessed by one thread at a time, there could already be a outstanding SendAsync-process for this socket
+                    //it'd be better to rewrite the message-sending system
+                    lock (socket)
+                    {
+                        var buffer = Encoding.UTF8.GetBytes(data);
+                        var segment = new ArraySegment<byte>(buffer);
+                        Task sendTask = socket.SendAsync(segment, WebSocketMessageType.Text, true, cancellationToken);
+                        sendTask.Wait();
+                    }
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                //an exception could be thrown if the websocket is not available.. we'll disconnect him then
-                await DisconnectUserFromServer(socketIdentifier);
+                //either the socket was not connected/available anymore or there is already a outstanding SendAsync-process for this socket - don't disconnect the user then because in general he's able to receive a message
+                //(the current messaging-system doesn't suit this case, a websocket should only be accessed by one thread at a time) - TODO!
+                if (!ex.Message.Contains("Websockets_AlreadyOneOutstandingOperation"))
+                {
+                    await DisconnectUserFromServer(socketIdentifier);
+                }
             }
         }
 

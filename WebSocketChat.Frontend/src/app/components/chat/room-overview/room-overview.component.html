@@ -1,0 +1,29 @@
+<div class="menu-header">
+  <div class="avatar self">
+    <img *ngIf="this.selfIdentifier.avatarBase64; else selfAvatarFallback" [src]="this.selfIdentifier.avatarBase64" />
+    <ng-template #selfAvatarFallback><i class="avatar-user-placeholder fa fa-user-circle" aria-hidden="true"></i></ng-template>
+  </div>
+</div>
+<div class="room-overview-list">
+  <div *ngFor="let room of roomList" (click)="requestNavigateToRoom(room)" class="room-item {{(room.roomIdentifier == this.currentRoom.roomIdentifier ? 'active' : '')}}">
+      <div class="avatar">
+        <img *ngIf="room.roomAvatarBase64;else roomAvatarFallback" class="avatar-image" [src]="room.roomAvatarBase64" />
+        <ng-template #roomAvatarFallback><span class="avatar-image"><i class="avatar-user-placeholder fa fa-users" aria-hidden="true"></i></span></ng-template>
+      </div>
+
+      <div class="room-body">
+          <div class="room-meta">
+              <span class="room-name">{{room.name}}</span>
+              <time class="room-last-message-time">{{this.formatDate(room.lastMessageTimestamp, "HH:mm")}}</time>
+          </div>
+          <div class="room-message">
+            <span>{{getRoomsLastMessage(room)}}</span>
+          </div>
+      </div>
+  </div>
+</div>
+
+ <!-- <div class="room-creation-button">
+  <button class="btn btn-secondary"><i class="fa fa-plus" aria-hidden="true"></i></button>
+
+</div>  -->

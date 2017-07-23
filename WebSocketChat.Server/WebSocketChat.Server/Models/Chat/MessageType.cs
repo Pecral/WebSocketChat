@@ -9,13 +9,18 @@ namespace WebSocketChat.Server.Models.Chat
     {
         None,
         ChatMessage,
-        UserLeaveMessage,
-        JoinRoomRequest,
-        CreateRoomRequest,
-        RequestConnections,
         UserJoinMessage,
+        UserLeaveMessage,
+
+        RoomJoinRequest,
+        RoomCreationRequest,
+        RoomInformation,
+
+        RequestConnections,
         ServerInformation,
+
         NicknameRequest,
-        RoomInformation
+
+        CustomNotificationMessage
     }
 }

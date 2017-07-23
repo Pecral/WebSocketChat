@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using WebSocketChat.Server.Common;
+using WebSocketChat.Server.Helper;
 using WebSocketChat.Server.Models.Chat;
 using WebSocketChat.Server.Models.Chat.Messages;
 using WebSocketChat.Server.Models.Chat.ThreadingHelper;
@@ -39,6 +40,19 @@ namespace WebSocketChat.Server.Network
             _globalRoom = CreateNewChatRoom();
             _globalRoom.Name = "Global Room";
             _globalRoom.IsPrivateRoom = false;
+            _globalRoom.RoomAvatarBase64 = ImageUrlToBase64Encoder.GetImageAsBase64Url("https://i.imgur.com/G4EjwqQ.jpg");
+            
+            //dummy rooms
+            var offtopicRoom = CreateNewChatRoom();
+            offtopicRoom.Name = "Offtopic";
+            offtopicRoom.RoomAvatarBase64 = ImageUrlToBase64Encoder.GetImageAsBase64Url("http://compsci.ca/v3/uploads/user_avatars/10820786614fe1f6d9ccbda.png");
+
+            var developmentRoom = CreateNewChatRoom();
+            developmentRoom.Name = "Development";
+
+            var testRoom = CreateNewChatRoom();
+            testRoom.Name = "Test";
+            testRoom.Password = "Test";
 
             _chatrooms.TryAdd(_globalRoom.RoomIdentifier, _globalRoom);
             _next = next;
@@ -144,8 +158,8 @@ namespace WebSocketChat.Server.Network
                         await HandleChatMessage(socketId, chatMessage.RoomIdentifier, chatMessage.Recipient, jsonMessage.ToString());
                     break;
 
-                    case MessageType.CreateRoomRequest:
-                        CreateRoomRequest roomRequest = jsonMessage.ToObject<CreateRoomRequest>();
+                    case MessageType.RoomCreationRequest:
+                        RoomCreationRequest roomRequest = jsonMessage.ToObject<RoomCreationRequest>();
                         ChatRoom newRoom = CreateNewChatRoom(roomRequest.RequestedRoom);
 
                         await InviteUsersToRoom(newRoom);
@@ -168,6 +182,56 @@ namespace WebSocketChat.Server.Network
                             await SendMessageIntoRoom(_globalRoom, JsonConvert.SerializeObject(nameRequest, Global.SerializerSettings));
                         }
                     break;
+
+                    case MessageType.RoomJoinRequest:
+                        RoomJoinRequest joinRequest = jsonMessage.ToObject<RoomJoinRequest>();
+                        await HandleRoomJoinRequest(joinRequest);
+                    break;
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// Handles the room join request of a user and adds him to the room if the password is correct
+        /// </summary>
+        /// <param name="joinRequest"></param>
+        /// <returns></returns>
+        private async Task HandleRoomJoinRequest(RoomJoinRequest joinRequest)
+        {
+            //send the user the result of his request (helper method to avoid duplicate code9
+            async Task sendRequestResult(bool success) {
+                //send the user a message back that the password was wrong
+                if (_sockets.TryGetValue(joinRequest.SenderGuid, out ChatPartner user))
+                {
+                    joinRequest.IsSuccessful = success;
+                    string serialized = JsonConvert.SerializeObject(joinRequest, Global.SerializerSettings);
+
+                    await SendStringAsync(user.WebSocket, user.Identifier, serialized, CancellationToken.None);
+                }
+            }
+
+            //check if the room exists and if the correct password is supplied (if the room is password protected)
+            if (_chatrooms.TryGetValue(joinRequest.RoomIdentifier, out ChatRoom joinRoom))
+            {
+                if ((!joinRoom.IsPasswordProtected || joinRoom.Password == joinRequest.Password)
+                    && !joinRoom.ConnectedUsers.Contains(joinRequest.SenderGuid))
+                {
+                    joinRoom.ConnectedUsers.Add(joinRequest.SenderGuid);
+
+                    var joinMessage = new UserJoinMessage()
+                    {
+                        SenderGuid = joinRequest.SenderGuid,
+                        RoomIdentifier = joinRequest.RoomIdentifier,
+                        Timestamp = DateTime.Now
+                    };
+
+                    await sendRequestResult(true);
+                    await InformUsersAboutJoin(joinMessage);
+                }
+                else
+                {
+                    await sendRequestResult(false);
                 }
             }
         }
@@ -280,7 +344,7 @@ namespace WebSocketChat.Server.Network
                 ChatUser = newChatPartner
             };
 
-            await InformServerAboutJoin(joinMessage);
+            await InformUsersAboutJoin(joinMessage);
         }
 
         /// <summary>
@@ -325,11 +389,11 @@ namespace WebSocketChat.Server.Network
         }
 
         /// <summary>
-        /// Inform all users about the new user
+        /// Inform all users about a joining user
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        private async Task InformServerAboutJoin(UserJoinMessage message)
+        private async Task InformUsersAboutJoin(UserJoinMessage message)
         {
             //send the joining user his user name and all other users that he joined the server
             await Task.WhenAll(_sockets.Select(socket =>

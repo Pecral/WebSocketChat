@@ -1,10 +1,10 @@
-<div class="wrapper {{((message.senderGuid == identifier) ? 'self' : 'other')}}">
+<div class="wrapper {{((message.senderGuid == identifier) ? 'self fade-in-left' : 'other fade-in-right')}}">
   <div *ngIf="(message.senderGuid != identifier)" class="avatar"><img [src]="message.avatarSourceUrl" draggable="false" /></div>
   <div class="msg">
     <div *ngIf="(message.senderGuid != identifier)" class="user">{{message.senderName}}</div>
     <div class="message-text">
       <p>{{message.message}}</p>
     </div>
-    <time>{{message.timestamp.toLocaleTimeString()}}</time>
+    <time>{{formatDate(message.timestamp, "HH:mm")}}</time>
   </div>
 </div>

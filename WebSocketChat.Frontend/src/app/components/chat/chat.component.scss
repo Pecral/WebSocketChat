@@ -1,0 +1,55 @@
+@import 'themes.scss';
+
+:host{
+   display:flex;
+   flex-direction: row;
+   overflow-x:auto;
+}
+
+:host-context(.dark-theme) .pane {
+    background-color: $dark-background-color;
+}
+
+:host-context(.light-theme) .pane {
+    background-color: $light-background-color;
+}
+
+/* the panes should be able to shrink past their content size */
+.pane {
+   min-width: 0;
+   transition: flex 300ms cubic-bezier(0, 0, 0.94, 0.96);
+}
+
+/* Active panes have a higher z-index to prevent the problem that images from the other pane are still displayed */
+.pane.active {
+    z-index: 2;
+}
+
+@media screen and (max-width:768px) {
+   /* Hide panes which are not active in mobile mode */
+   .pane:not(.active) {
+       flex-grow: 0.00001; 
+       flex-basis: 0;
+       flex-shrink: 1;
+   }
+   /* Full size panes in mobile mode */
+   .pane.active {
+      flex: 1 1 auto;
+   }
+}
+
+@media screen and (min-width:768px) {
+   .left-pane {
+      flex: 0 0 350px;
+   }
+
+   :host-context(.dark-theme) .left-pane, :host-context(.light-theme) .left-pane {
+      border-right: 2px solid $dark-menu-color;       
+   }
+
+   .middle-pane {
+      flex: 1 1 auto;
+   }
+}
+
+

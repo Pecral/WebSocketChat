@@ -1,3 +1,8 @@
-<ng-container *ngIf="this.roomDictionary">
-  <chat-room *ngFor="let room of roomDictionary | mapPipe" [chatRoom]="room.value" [selfIdentifier]="this.selfIdentifier" (messageSend)="sendMessage($event)"></chat-room>
-</ng-container>
+<div class="pane left-pane {{this.chatIsActiveWindow ? '' : 'active'}}">
+  <room-overview [selfIdentifier]="selfIdentifier" [roomList]="roomList" [currentRoom]="currentRoom" (navigateToRoom)="navigateToRoom($event)"></room-overview>
+</div>
+<div class="pane middle-pane {{this.chatIsActiveWindow ? 'active' : ''}}">
+  <ng-container *ngIf="this.roomList">
+    <chat-room [chatRoom]="currentRoom" [selfIdentifier]="this.selfIdentifier" (messageSend)="sendMessage($event)" (navigateToRoomOverview)="this.chatIsActiveWindow = false"></chat-room>
+  </ng-container>
+</div>

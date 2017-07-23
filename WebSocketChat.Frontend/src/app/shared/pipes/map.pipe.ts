@@ -5,18 +5,19 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 /** Transforms a map to a key-value array which can be used *ngFor-statement */
 export class MapPipe implements PipeTransform {
+   mapEntries = [];
 
    transform(value: Map<any, any>, args?: any): any {
-      let mapEntries = [];
+      this.mapEntries.length = 0;
 
       value.forEach((mapValue, key) => {
-         mapEntries.push({
+         this.mapEntries.push({
             key: key,
             value: mapValue
          });
       });
 
-      return mapEntries;
+      return this.mapEntries;
    }
 
 }

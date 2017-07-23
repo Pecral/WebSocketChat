@@ -6,15 +6,18 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 /** 3rd Party */
 import { SplitPaneModule } from 'ng2-split-pane/lib/ng2-split-pane';
-import { AccordionModule, PanelModule } from 'primeng/primeng';
 import { NgxAutoScroll } from 'ngx-auto-scroll/lib/ngx-auto-scroll.directive';
+import { VirtualScrollModule } from 'angular2-virtual-scroll';
 
 /** Components */
 import { AppComponent } from './app.component';
 import { ChatRoomComponent } from './components/chat/room/chat-room.component';
 import { ChatNotificationComponent } from './components/chat/notification/chat-notification.component';
+import { PasswordRequestNotificationComponent } from './components/chat/notification/password-request-notification/password-request-notification.component';
+
 import { ChatMessageComponent } from './components/chat/message/chat-message.component';
 import { ChatComponent } from './components/chat/chat.component';
+import { ChatRoomOverviewComponent } from './components/chat/room-overview/room-overview.component';
 
 /** Services  */
 import { ChatService } from './shared/services/websocket-chat.service';
@@ -30,6 +33,8 @@ import { MapPipe } from './shared/pipes/map.pipe';
     ChatMessageComponent,
     ChatRoomComponent,
     ChatNotificationComponent,
+    PasswordRequestNotificationComponent,
+    ChatRoomOverviewComponent,
 
     /** Pipes */
     MapPipe,
@@ -38,13 +43,14 @@ import { MapPipe } from './shared/pipes/map.pipe';
     NgxAutoScroll
   ],
   imports: [
+    /** Angular */
     BrowserModule,
     FormsModule,
     BrowserAnimationsModule,
 
-    AccordionModule,
-    PanelModule,
-    SplitPaneModule
+    /** 3rd party */
+    SplitPaneModule,
+    VirtualScrollModule
   ],
   providers: [ChatService],
   bootstrap: [AppComponent]

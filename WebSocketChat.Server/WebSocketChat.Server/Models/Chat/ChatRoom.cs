@@ -45,6 +45,11 @@ namespace WebSocketChat.Server.Models.Chat
         public string Description { get; set; }
 
         /// <summary>
+        /// Base64 string representation of the room's avatar
+        /// </summary>
+        public string RoomAvatarBase64 { get; set; }
+
+        /// <summary>
         /// Identifier-GUIDs of all users which have joined this room
         /// </summary>
         public List<string> ConnectedUsers { get; set; }
@@ -55,7 +60,7 @@ namespace WebSocketChat.Server.Models.Chat
         public bool IsPrivateRoom { get; set; }
 
         /// <summary>
-        /// Optional password-protection.
+        /// Optional password-protection. This property won't be serialized.
         /// </summary>
         public string Password { get; set; }
 

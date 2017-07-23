@@ -9,8 +9,13 @@ namespace WebSocketChat.Server.Models.Chat.Messages
     /// This class is a proxy class for the case that a user wants to create a new room.
     /// We don't need to declare all of the room's properties in this class, but we can use the ChatRoom class itself.
     /// </summary>
-    public class CreateRoomRequest : Message
+    public class RoomCreationRequest : Message
     {
+        public RoomCreationRequest()
+        {
+            MessageType = MessageType.RoomCreationRequest;
+        }
+
         /// <summary>
         /// The requested room
         /// </summary>

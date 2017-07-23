@@ -21,18 +21,22 @@
       "styles": [
         "../node_modules/font-awesome/css/font-awesome.min.css",
         "../node_modules/bootstrap/dist/css/bootstrap.min.css",
-        "../node_modules/primeng/resources/themes/bootstrap/theme.css",
-        "../node_modules/primeng/resources/primeng.min.css",
-        "styles.css"
+        "styles.scss"
       ],
       "scripts": [
-        "../node_modules/jquery/dist/jquery.min.js"
       ],
       "environmentSource": "environments/environment.ts",
       "environments": {
         "dev": "environments/environment.ts",
         "prod": "environments/environment.prod.ts"
+      },
+      "stylePreprocessorOptions": {
+        "includePaths": [
+          "app/styles",
+          "app/styles/themes"
+        ]
       }
+
     }
   ],
   "e2e": {
@@ -57,7 +61,7 @@
     }
   },
   "defaults": {
-    "styleExt": "css",
+    "styleExt": "scss",
     "component": {}
   }
 }

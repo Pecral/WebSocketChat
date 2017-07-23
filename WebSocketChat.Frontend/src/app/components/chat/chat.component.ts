@@ -1,5 +1,5 @@
 /** Angular */
-import { Component, OnInit, QueryList, ViewChildren, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Subject, Subscription } from 'rxjs/Rx';
 
 /** Models */
@@ -15,13 +15,17 @@ import { ChatService } from './../../shared/services/websocket-chat.service';
 @Component({
    selector: 'app-chat',
    templateUrl: './chat.component.html',
-   styleUrls: ['./chat.component.css']
+   styleUrls: ['./chat.component.scss']
 })
 export class ChatComponent implements OnInit {
    //proxy methods to acess service properties
    userDictionary: Map<string, ChatUser>;
-   roomDictionary: Map<number, ChatRoom>;
+   roomList : Array<ChatRoom> = [];
+   currentRoom: ChatRoom;
+
    selfIdentifier: ChatUser = new ChatUser();
+
+   chatIsActiveWindow:boolean = true;
 
    constructor(private chatService: ChatService) {
 
@@ -29,7 +33,8 @@ export class ChatComponent implements OnInit {
 
    ngOnInit() {
       this.userDictionary = this.chatService.userDictionary;
-      this.roomDictionary = this.chatService.roomDictionary;
+      this.roomList = this.chatService.roomList;
+      this.currentRoom = this.chatService.globalRoom;
       this.chatService.selfIdentifierChanged.subscribe((identification : ChatUser) => {
          this.selfIdentifier = identification;
       });
@@ -37,7 +42,11 @@ export class ChatComponent implements OnInit {
 
    /** Proxy method to pass messages to the webservice */
    sendMessage(message: ChatMessage | NicknameRequest):void {
-      if(message instanceof ChatMessage || this.isNicknameAvailable(message.requestedNickname)) {
+      //if we didn't join the room yet, all messages will be seen as passwords which are used to connect into the room
+      if(!this.currentRoom.hasJoinedRoom && message instanceof ChatMessage) {
+         this.chatService.startRoomJoinRequest(this.currentRoom.roomIdentifier, message.message);
+      }
+      else if(message instanceof ChatMessage || this.isNicknameAvailable(message.requestedNickname)) {
          this.chatService.sendMessage(message);
       }
    }
@@ -54,5 +63,15 @@ export class ChatComponent implements OnInit {
       });
 
       return isAvailable;
+   }
+
+   /** Navigate to chatroom  */
+   navigateToRoom(room: ChatRoom) {
+      this.currentRoom = room;
+      this.chatIsActiveWindow = true
+
+      if(!room.hasJoinedRoom) {
+         this.chatService.startRoomJoinRequest(room.roomIdentifier, "");
+      }
    }
 }

@@ -1,0 +1,105 @@
+@import 'themes.scss';
+
+.notification {
+	display: flex;
+    align-items: center;
+    vertical-align: middle;
+    justify-content: space-around;
+    position: relative;
+    text-align: center;
+    font-size: 13px;
+    line-height: 30px;
+    border-radius: 100px;
+    margin: 7px auto;
+    width: 30%;
+	min-width: 300px;
+    box-shadow: 0px 1px 0px rgba(0,0,0,.05), 0px -1px 0px rgba(0,0,0,.05), inset 0px 1px 0px rgba(255,255,255,.02), inset 0px -1px 0px rgba(255,255,255,.02);
+    text-shadow: 0px -1px 0px rgba(0,0,0,.1), 0px 1px 0px rgba(255,255,255,.05);
+    cursor: default;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    transition: all .2s cubic-bezier(0.565, -0.260, 0.255, 1.410);
+}
+
+.notification time {
+
+    font-size: 11px;
+    padding: 8px;
+    border-radius: 100px;
+    box-shadow: 0px 0px 2px rgba(255, 255, 255, 0), inset 0px 0px 1px rgba(27,35,42,0.1);
+    height: 1px;
+    line-height: 0px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    transition: all .2s cubic-bezier(0.565, -0.260, 0.255, 1.410);
+}
+
+
+:host-context(.dark-theme) {
+    .notification {
+        color: rgba(255,255,255,0.5);
+        background: rgba(234, 247, 255, 0.035);
+    }
+
+    .notification time {
+        background: #252C33;
+        color: rgba(255,255,255,0.5);
+    }
+
+    .notification.alert {
+        border-color: $dark-alert;
+    }
+}
+
+:host-context(.light-theme) {
+    .notification {
+        color: $light-background-color;
+        background: $dark-background-color;
+    }
+
+    .notification time {
+        background-color: $light-background-color;
+        color: $light-foreground-color;
+    }    
+
+    .notification.alert {
+        border-color: $light-alert;
+    }    
+}
+
+
+@media (max-width: 315px) {
+    .notification {
+        min-width: 98%;
+        width: 98%;
+        text-align: left;
+        padding-left: 9px;
+    }
+}
+
+@media screen and (max-width: 750px) {
+    .chat .notification {
+        font-size: 12px;
+        margin: 7px 30%;
+        width: 40%;
+    }
+}
+@media screen and (max-width: 550px) {
+    .chat .notification {
+        font-size: 12px;
+        margin: 7px 0px;
+        width: 100%;
+        border-radius: 0px;
+    }
+    .chat .notification time {
+        right: 10px;
+    }
+}
+
+.notification .content {
+    padding-right: 15px;
+}

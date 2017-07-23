@@ -1,0 +1,157 @@
+@import 'themes';
+:host {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    white-space: nowrap;
+    position: relative;
+    height: 100%;
+
+}
+
+:host-context(.dark-theme) .room-overview-list {
+        color: $dark-foreground-color;
+}
+
+:host-context(.light-theme) .room-overview-list {
+    :host {
+        color: $light-foreground-color;
+    }
+}
+
+.menu-header {
+    flex: 0 0 60px;
+    display: flex;
+    align-items: center;
+    color: $dark-foreground-color;
+    background-color: $dark-menu-color;
+}
+
+/* Search-Bar */
+
+.room-search {
+    flex: 0 0 50px;
+}
+
+/* Room-List */
+
+.room-overview-list {
+    padding-top: 12px;
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    align-self: stretch;
+}
+
+.room-item {
+    flex: 0 0 65px;
+    display: flex;
+    flex-direction: row;
+    transition: background-color 300ms ease-in-out, color 300ms ease-in-out;
+}
+
+:host-context(.dark-theme) {
+    .room-item:hover,
+    .room-item.active {
+        background-color: $dark-foreground-color;
+        color: $dark-menu-color;
+    }
+}
+
+:host-context(.light-theme) {
+    .room-item:hover,
+    .room-item.active {
+        background-color: darken($light-background-color, 5%);
+        color: #1c242b;
+    }
+}
+
+.room-item:last-child .room-body {
+    border-bottom: 1px solid #969696;
+}
+
+.room-body {
+    flex: 1 1 auto;
+    border-top: 1px solid #969696;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: stretch;
+}
+
+.avatar {
+    flex: 0 0 72px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    justify-content: center;
+}
+
+.avatar-image {
+    width: 50px;
+    height: 50px;
+    display:flex;
+    align-items:center;
+    justify-content: center;
+}
+
+.avatar img {
+    border:1px solid #969696;
+    vertical-align: middle;
+}
+
+.avatar.self img {
+    width: 40px;
+    height: 40px;
+}
+
+.avatar-user-placeholder {
+    font-size: 2em;
+}
+
+.room-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.room-name {
+    font-weight: 700;
+}
+
+.room-message {
+    font-size: 14px;
+}
+
+.room-body,
+.room-message,
+.room-meta {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.room-last-message-time {
+    flex: 0 0 55px;
+    text-align: center;
+    font-size: 12px;
+    vertical-align: bottom;
+}
+
+
+/* Room creation button */
+
+.room-creation-button {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    right: 20px;
+    bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.room-creation-button button {
+    cursor: pointer;
+}

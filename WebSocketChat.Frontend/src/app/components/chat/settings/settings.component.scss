@@ -1,0 +1,18 @@
+@import 'themes.scss';
+
+:host {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    white-space: nowrap;
+    position: relative;
+    height: 100%;   
+}
+
+.menu-header {
+    flex: 0 0 60px;
+    display: flex;
+    align-items: center;
+    color: $dark-foreground-color;
+    background-color: $dark-menu-color;
+}

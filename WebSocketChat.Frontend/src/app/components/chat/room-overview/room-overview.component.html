@@ -3,9 +3,11 @@
     <img *ngIf="this.selfIdentifier.avatarBase64; else selfAvatarFallback" [src]="this.selfIdentifier.avatarBase64" />
     <ng-template #selfAvatarFallback><i class="avatar-user-placeholder fa fa-user-circle" aria-hidden="true"></i></ng-template>
   </div>
+  <button class="btn btn-secondary settings" (click)="navigateToSettings()"><i class="fa fa-cog" aria-hidden="true"></i>
+</button>
 </div>
 <div class="room-overview-list">
-  <div *ngFor="let room of roomList" (click)="requestNavigateToRoom(room)" class="room-item {{(room.roomIdentifier == this.currentRoom.roomIdentifier ? 'active' : '')}}">
+  <div *ngFor="let room of roomList" (click)="navigateToRoom(room)" class="room-item {{(room.roomIdentifier == navigation.currentRoom.roomIdentifier ? 'active' : '')}}">
       <div class="avatar">
         <img *ngIf="room.roomAvatarBase64;else roomAvatarFallback" class="avatar-image" [src]="room.roomAvatarBase64" />
         <ng-template #roomAvatarFallback><span class="avatar-image"><i class="avatar-user-placeholder fa fa-users" aria-hidden="true"></i></span></ng-template>

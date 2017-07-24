@@ -19,12 +19,46 @@
     }
 }
 
+/* Header */
+
 .menu-header {
     flex: 0 0 60px;
     display: flex;
     align-items: center;
     color: $dark-foreground-color;
     background-color: $dark-menu-color;
+}
+
+button.settings {
+    align-self: center;
+    margin-left: auto;
+    margin-right: 12px;
+    padding: 0.1rem .5rem;
+    background-color: $dark-menu-color;
+    border: 1px solid $light-background-color;
+    box-shadow: 0 0 0 0px;
+    cursor:pointer;
+    
+    i {
+        color: $light-background-color;
+    }
+
+    &:focus i {
+        animation: fa-spin 2s infinite linear;
+    }
+}
+
+
+:host-context(.dark-theme) {
+    button.settings {
+
+    }
+}
+
+:host-context(.light-theme) {
+    button.settings {
+
+    }
 }
 
 /* Search-Bar */

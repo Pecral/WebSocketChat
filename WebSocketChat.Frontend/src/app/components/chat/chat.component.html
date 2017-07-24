@@ -1,8 +1,9 @@
-<div class="pane left-pane {{this.chatIsActiveWindow ? '' : 'active'}}">
-  <room-overview [selfIdentifier]="selfIdentifier" [roomList]="roomList" [currentRoom]="currentRoom" (navigateToRoom)="navigateToRoom($event)"></room-overview>
+<div class="pane left-pane {{navigation.chatIsActiveWindow ? '' : 'active'}}">
+  <room-overview [selfIdentifier]="selfIdentifier" [roomList]="roomList"></room-overview>
 </div>
-<div class="pane middle-pane {{this.chatIsActiveWindow ? 'active' : ''}}">
-  <ng-container *ngIf="this.roomList">
+<div class="pane middle-pane {{navigation.chatIsActiveWindow ? 'active' : ''}}">
+  <router-outlet></router-outlet>
+  <!-- <ng-container *ngIf="this.roomList">
     <chat-room [chatRoom]="currentRoom" [selfIdentifier]="this.selfIdentifier" (messageSend)="sendMessage($event)" (navigateToRoomOverview)="this.chatIsActiveWindow = false"></chat-room>
-  </ng-container>
+  </ng-container> -->
 </div>

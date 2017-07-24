@@ -1,12 +1,15 @@
+import { Router } from '@angular/router';
+import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
+
 import { NicknameRequest } from './../../../shared/models/chat/messages/nickname-request';
 import { UserLeaveMessage } from './../../../shared/models/chat/messages/user-leave-message';
 import { UserJoinMessage } from './../../../shared/models/chat/messages/user-join-message';
 import { ChatMessage } from './../../../shared/models/chat/messages/chat-message';
 import { ChatUser } from './../../../shared/models/chat/chat-user';
 import { ChatRoom } from './../../../shared/models/chat/chat-room';
-import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-
 import * as moment from 'moment';
+
+import { NavigationService } from './../../../shared/settings/navigation.service';
 
 @Component({
    selector: 'room-overview',
@@ -22,15 +25,9 @@ export class ChatRoomOverviewComponent implements OnInit {
    userList: Array<ChatUser> = [];
 
    @Input()
-   currentRoom: ChatRoom;
-
-   @Input()
    selfIdentifier: ChatUser;
 
-   @Output()
-   navigateToRoom: EventEmitter<ChatRoom> = new EventEmitter<ChatRoom>();
-
-   constructor() { }
+   constructor(private router: Router, public navigation: NavigationService) { }
 
    ngOnInit() {
    }
@@ -41,8 +38,13 @@ export class ChatRoomOverviewComponent implements OnInit {
    }
 
    /** Fires the navigateToRoom-event if the requested room is not the same as the current room */
-   requestNavigateToRoom(requestedRoom: ChatRoom): void  {
-      this.navigateToRoom.next(requestedRoom);
+   navigateToRoom(requestedRoom: ChatRoom): void  {
+      this.router.navigate(['/chatroom', requestedRoom.roomIdentifier]);
+   }
+
+   /** Navigate to settings */
+   navigateToSettings(): void {
+      this.router.navigate(['/settings']);
    }
 
    /** Get the room's last message depending on its type */

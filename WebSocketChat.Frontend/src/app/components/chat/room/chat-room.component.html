@@ -1,4 +1,4 @@
-<div class="chat-app-wrapper">
+<div *ngIf="chatRoom" class="chat-app-wrapper">
   <div class="chat-menu container-fluid {{(detailedMenu ? 'detailed' : 'simple')}}" (click)="detailedMenu = !detailedMenu">
     <div class="menu-back menu-header-item" (click)="triggerNavigateToRoomOverview()">
       <a href="#" class="back"><i class="fa fa-angle-left"></i>

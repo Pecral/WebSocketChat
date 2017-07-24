@@ -1,10 +1,10 @@
 <div *ngIf="chatRoom" class="chat-app-wrapper">
   <div class="chat-menu container-fluid {{(detailedMenu ? 'detailed' : 'simple')}}" (click)="detailedMenu = !detailedMenu">
     <div class="menu-back menu-header-item" (click)="triggerNavigateToRoomOverview()">
-      <a href="#" class="back"><i class="fa fa-angle-left"></i>
+      <div class="back"><i class="fa fa-angle-left"></i>
         <img *ngIf="chatRoom.roomAvatarBase64;else roomAvatarFallback" class="group-picture" [src]="chatRoom.roomAvatarBase64" />
         <ng-template #roomAvatarFallback><span class="group-picture"><i class="avatar-user-placeholder fa fa-inverse fa-users" aria-hidden="true"></i></span></ng-template>      
-      </a>
+      </div>
     </div>
     <div class="menu-header-item desktop-only">
       <img *ngIf="chatRoom.roomAvatarBase64;else roomAvatarFallback" class="group-picture" [src]="chatRoom.roomAvatarBase64" />

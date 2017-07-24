@@ -47,15 +47,10 @@ export class ChatNotificationComponent implements OnInit {
    /** Returns the notification message based on the type of the notification  */
    getMessageContent(): string {
       if (this.notificationMessage instanceof UserJoinMessage) {
-         return "has joined the server."
+        return "has joined the " + (this.notificationMessage.roomIdentifier != 0 ? "room" : "server") + ".";    
       }
       else if (this.notificationMessage instanceof (UserLeaveMessage)) {
-         if (this.notificationMessage.roomIdentifier != 0) {
-            return "has left the room."
-         }
-         else {
-            return "has left the server."
-         }
+        return "has left the " + (this.notificationMessage.roomIdentifier != 0 ? "room" : "server") + ".";   
       }
       else {
          return `is now named ${this.notificationMessage.requestedNickname}.`;

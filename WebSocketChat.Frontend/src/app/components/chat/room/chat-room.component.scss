@@ -1,4 +1,5 @@
 @import 'themes.scss';
+
 ::selection {
    background: rgba(82, 179, 217, 0.3);
    color: inherit;
@@ -46,6 +47,13 @@
    flex: 0 0 auto;
    padding: 0px 15px;
    white-space: nowrap;
+   display: flex;
+   align-items: center;   
+}
+
+.menu-header-item a {
+   display:flex;
+   align-items: center;
 }
 
 .menu-back .back:hover,
@@ -73,8 +81,16 @@
       transition: all .2s ease-in-out 0s;
       -webkit-transform: scaleX(0);
       transform: scaleX(0);
-      background-color: #aaaaaa;
    }
+
+   :host-context(.dark-theme) .back:before {
+     background-color: $dark-foreground-color;
+   }
+
+   :host-context(.light-theme) .back:before {
+     background-color: black;
+   }   
+
    .back:hover:before {
       visibility: visible;
       -webkit-transform: scaleX(1);

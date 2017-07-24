@@ -27,27 +27,11 @@ export class PasswordRequestNotificationComponent extends ChatNotificationCompon
 
    toggleHeartbeat: boolean;
 
-   // @HostBinding('class') heartbeatClass = 'attention-heartbeat';
-
    ngOnInit() {
    }
 
    /** Trigger the heartbeat animation */
    triggerHeartbeat() {
       this.toggleHeartbeat = !this.toggleHeartbeat;
-      // this.heartbeatClass = '';
-      // this.heartbeatClass = 'attention-heartbeat';
    }
-
-   getMessage():string {
-      if(this.notificationMessage instanceof RoomJoinRequest) {
-         if(this.notificationMessage.isSuccessful) {
-            return "You have successfully joined the room.";
-         }
-         else {
-            return "This room is password protected. Please type in the correct password."
-         }
-      }
-   }
-
 }

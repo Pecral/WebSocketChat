@@ -57,10 +57,10 @@ export class ChatRoomOverviewComponent implements OnInit {
          }
       }
       else if(message instanceof UserJoinMessage)  {
-         return message.senderName + " has joined the room";
+         return message.senderName + " has joined the " + (message.roomIdentifier != 0 ? "room" : "server") + ".";
       }
       else if(message instanceof UserLeaveMessage) {
-         return message.senderName + " has left the room";
+         return message.senderName + " has left the " + (message.roomIdentifier != 0 ? "room" : "server") + ".";
       }
       else if(message instanceof NicknameRequest) {
          return message.oldNickname + " is now named " + message.requestedNickname;

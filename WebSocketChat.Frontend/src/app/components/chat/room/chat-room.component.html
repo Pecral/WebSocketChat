@@ -1,31 +1,38 @@
 <div class="chat-app-wrapper">
   <div class="chat-menu container-fluid {{(detailedMenu ? 'detailed' : 'simple')}}" (click)="detailedMenu = !detailedMenu">
-      <div class="menu-back menu-header-item" (click)="triggerNavigateToRoomOverview()">
-        <a href="#" class="back"><i class="fa fa-angle-left"></i> <img class="group-picture" *ngIf="this.chatRoom.roomAvatarBase64" [src]="this.chatRoom.roomAvatarBase64" /></a>
-      </div>
-      <div class="menu-header-item desktop-only">
+    <div class="menu-back menu-header-item" (click)="triggerNavigateToRoomOverview()">
+      <a href="#" class="back"><i class="fa fa-angle-left"></i>
         <img *ngIf="chatRoom.roomAvatarBase64;else roomAvatarFallback" class="group-picture" [src]="chatRoom.roomAvatarBase64" />
-        <ng-template #roomAvatarFallback><span class="group-picture"><i class="avatar-user-placeholder fa fa-inverse fa-users" aria-hidden="true"></i></span></ng-template>
+        <ng-template #roomAvatarFallback><span class="group-picture"><i class="avatar-user-placeholder fa fa-inverse fa-users" aria-hidden="true"></i></span></ng-template>      
+      </a>
+    </div>
+    <div class="menu-header-item desktop-only">
+      <img *ngIf="chatRoom.roomAvatarBase64;else roomAvatarFallback" class="group-picture" [src]="chatRoom.roomAvatarBase64" />
+      <ng-template #roomAvatarFallback><span class="group-picture"><i class="avatar-user-placeholder fa fa-inverse fa-users" aria-hidden="true"></i></span></ng-template>
+    </div>
+    <div class="">
+      <div class="name">{{this.chatRoom.name}}</div>
+      <div class="members">
+        <b *ngIf="chatRoom.hasJoinedRoom">{{this.selfIdentifier.nickname}}</b>{{this.chatRoom.nicknameStringAggregation}}
       </div>
-      <div class="">
-        <div class="name">{{this.chatRoom.name}}</div>
-        <div class="members">
-          <b *ngIf="chatRoom.hasJoinedRoom">{{this.selfIdentifier.nickname}}</b>{{this.chatRoom.nicknameStringAggregation}}
-        </div>
-      </div>
+    </div>
   </div>
+
   <div #chatWrapper class="chat-messages" ngx-auto-scroll>
     <ol class="chat">
       <li *ngFor="let message of chatRoom.messages">
-        <chat-message *ngIf="message.messageType == messageType.ChatMessage;else notificationMessage" class="chat-message"
-          [message]="message" [identifier]="selfIdentifier.identifier"></chat-message>
+        <chat-message *ngIf="message.messageType == messageType.ChatMessage;else notificationMessage" class="chat-message" [message]="message"
+          [identifier]="selfIdentifier.identifier"></chat-message>
         <ng-template #notificationMessage>
-           <password-request-notification *ngIf="message.messageType == messageType.RoomJoinRequest;else genericNotification" [notificationMessage]="message"></password-request-notification>
-          <ng-template #genericNotification><chat-notification  [notificationMessage]="message"></chat-notification></ng-template> 
+          <password-request-notification *ngIf="message.messageType == messageType.RoomJoinRequest;else genericNotification" [notificationMessage]="message"></password-request-notification>
+          <ng-template #genericNotification>
+            <chat-notification [notificationMessage]="message"></chat-notification>
+          </ng-template>
         </ng-template>
       </li>
     </ol>
   </div>
-  <input class="chat-input" type="text" placeholder="Type here!" [(ngModel)]="currentMessage" (keyup.enter)="sendMessage(currentMessage)" />
+  <input class="chat-input" type="text" placeholder="Type here!" [(ngModel)]="currentMessage" (keyup.enter)="sendMessage(currentMessage)"
+  />
 </div>
 <!--<div class="emojis"></div>-->

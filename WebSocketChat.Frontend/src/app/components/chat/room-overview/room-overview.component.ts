@@ -39,7 +39,14 @@ export class ChatRoomOverviewComponent implements OnInit {
 
    /** Fires the navigateToRoom-event if the requested room is not the same as the current room */
    navigateToRoom(requestedRoom: ChatRoom): void  {
-      this.router.navigate(['/chatroom', requestedRoom.roomIdentifier]);
+      //if the requested room is already the current room, we will just set the chatroom-pane as the active pane
+      //otherwise we will navigate to the chatroom
+      if(this.navigation.currentRoom.roomIdentifier == requestedRoom.roomIdentifier) {
+         this.navigation.chatIsActiveWindow = true;
+      }
+      else {
+         this.router.navigate(['/chatroom', requestedRoom.roomIdentifier]);
+      }
    }
 
    /** Navigate to settings */

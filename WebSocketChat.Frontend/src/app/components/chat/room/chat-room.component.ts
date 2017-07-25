@@ -1,3 +1,4 @@
+import { ChatStorageService } from './../../../shared/settings/chat-storage.service';
 import { Router, ActivatedRoute, ParamMap } from '@angular/router';
 import { Component, OnInit, Input, Output, EventEmitter, ViewChild } from '@angular/core';
 
@@ -21,8 +22,6 @@ import { ChatService } from './../../../shared/services/websocket-chat.service';
    styleUrls: ['./chat-room.component.scss']
 })
 export class ChatRoomComponent implements OnInit {
-
-   selfIdentifier: ChatUser = new ChatUser();
 
    _chatRoom: ChatRoom;
    @Input()
@@ -66,7 +65,8 @@ export class ChatRoomComponent implements OnInit {
       private route: ActivatedRoute,
       private router: Router,
       private chatService: ChatService,
-      private navigation: NavigationService) {
+      private navigation: NavigationService,
+      public chatStorage: ChatStorageService) {
    }
 
    ngOnInit() {
@@ -74,10 +74,6 @@ export class ChatRoomComponent implements OnInit {
          let roomIdentifier = +params['id'];
          this.loadRoom(roomIdentifier);
       });
-
-      this.chatService.selfIdentifierChanged.subscribe((identification : ChatUser) => {
-         this.selfIdentifier = identification;
-      });      
    }
 
    /** Loads a chatroom */

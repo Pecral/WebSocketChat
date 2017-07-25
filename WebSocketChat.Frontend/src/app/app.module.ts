@@ -1,4 +1,3 @@
-
 /** Angular Modules  */
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -24,6 +23,7 @@ import { SettingsComponent } from './components/chat/settings/settings.component
 /** Services  */
 import { ChatService } from './shared/services/websocket-chat.service';
 import { NavigationService } from './shared/settings/navigation.service';
+import { ChatStorageService } from './shared/settings/chat-storage.service';
 
 /** Pipes */
 import { MapPipe } from './shared/pipes/map.pipe';
@@ -63,7 +63,7 @@ const appRoutes: Routes = [
     SplitPaneModule,
     VirtualScrollModule
   ],
-  providers: [ChatService, NavigationService],
+  providers: [ChatService, NavigationService, ChatStorageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

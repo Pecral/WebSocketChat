@@ -1,3 +1,4 @@
+import { ChatStorageService } from './../settings/chat-storage.service';
 import { ImageBase64Encoder } from './../helper/ImageBase64Encoder';
 import { RoomCreationRequest } from './../models/chat/messages/room-creation-request';
 import { RoomJoinRequest } from './../models/chat/messages/room-join-request';
@@ -31,7 +32,11 @@ export class ChatService {
 
    selfIdentifierChanged: EventEmitter<ChatUser> = new EventEmitter<ChatUser>();
 
-   constructor() {
+   constructor(private chatStorage: ChatStorageService) {
+      //save instances of user dictionary and room list in chat storage
+      this.chatStorage.roomList = this.roomList;
+      this.chatStorage.userDictionary = this.userDictionary;
+
       //create dummy global room
       this.globalRoom = new ChatRoom();
       this.globalRoom.roomIdentifier = 0;
@@ -168,6 +173,7 @@ export class ChatService {
          if (joinMessage.isOriginOfMessage) {
             this.selfIdentifier = joinMessage.chatUser;
             this.selfIdentifierChanged.next(joinMessage.chatUser);
+            this.chatStorage.selfIdentifier = this.selfIdentifier;
          }
 
          //add user to dictionary if it's a new user

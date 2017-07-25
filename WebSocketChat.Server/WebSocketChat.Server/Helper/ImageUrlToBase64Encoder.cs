@@ -10,13 +10,22 @@ namespace WebSocketChat.Server.Helper
     {
         public static string GetImageAsBase64Url(string url)
         {
-            using (var client = new HttpClient())
+            try
             {
-                var loadTask = client.GetByteArrayAsync(url);
-                loadTask.Wait();
-                var bytes = loadTask.Result;
-                return "data:image/jpg;base64," + Convert.ToBase64String(bytes);
+                using (var client = new HttpClient())
+                {
+                    var loadTask = client.GetByteArrayAsync(url);
+                    loadTask.Wait();
+                    var bytes = loadTask.Result;
+                    return "data:image/jpg;base64," + Convert.ToBase64String(bytes);
+                }
             }
+            catch(Exception ex)
+            {
+
+            }
+
+            return "";
         }
     }
 }

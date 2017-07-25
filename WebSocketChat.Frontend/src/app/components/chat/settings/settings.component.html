@@ -1,3 +1,49 @@
 <div class="menu-header">
+   <div class="back" (click)="exitSettings()">
+      <i class="fa fa-angle-left"></i>
+   </div>
+</div>
+<div class="content">
+  <h4>Application Theme</h4>
+  <div class="themeroller">
+      <div class="btn-group" data-toggle="buttons">
+         <label class="btn btn-outline-themed {{(this.appSettings.applicationTheme == 'light' ? 'active' : '')}}" (click)="changeApplicationTheme('light')">
+               <input type="radio" name="options" id="boots" autocomplete="off" checked> Light
+            </label>
+         <label class="btn btn-outline-themed {{(this.appSettings.applicationTheme == 'dark' ? 'active' : '')}}" (click)="changeApplicationTheme('dark')">
+               <input type="radio" name="options" id="shoes" autocomplete="off"> Dark
+            </label>
+      </div>
+   </div>
+
+  <br />
+
+  <h4>Message Design</h4>
+  <div class="message-theme-wrapper">
+    <div class="message-theme-options">
+      <label class="radio" (click)="changeMessageTheme('bubble')">
+            <input type="radio" value="bubble" checked>
+            <b>Bubble: </b><span>Classic messenger theme.</span>
+      </label>
+      <label class="radio" (click)="changeMessageTheme('compact_with_avatars')">
+            <input type="radio" value="compact_with_avatars" disabled>
+            <b>Clean: </b><span>Compact messages aligned to the left.</span>
+      </label>
+      <label class="radio" (click)="changeMessageTheme('classic')">
+            <input type="radio" value="classic" disabled>
+            <b>Compact: </b><span>The good ol' days of IRC.</span>
+      </label>
+    </div>
+
+    <div class="message-theme-preview"> 
+      <!-- <ol class="chat">
+         <li></li>
+         <li></li>
+      </ol> -->
+      <chat-message [message]="this.previewMessageSelf" identifier="preview"></chat-message>
+      <chat-message [message]="this.previewMessage" identifier="preview"></chat-message>
+
+    </div>
+  </div>
 
 </div>

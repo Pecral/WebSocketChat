@@ -4,6 +4,8 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class NavigationService {
 
+   applicationTheme = "light";
+   
    currentRoom: ChatRoom;
    chatIsActiveWindow:boolean = true;   
 

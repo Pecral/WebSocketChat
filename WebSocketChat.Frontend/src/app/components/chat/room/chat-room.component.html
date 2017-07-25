@@ -13,7 +13,7 @@
     <div class="">
       <div class="name">{{this.chatRoom.name}}</div>
       <div class="members">
-        <b *ngIf="chatRoom.hasJoinedRoom">{{this.selfIdentifier.nickname}}</b>{{this.chatRoom.nicknameStringAggregation}}
+        <b *ngIf="chatRoom.hasJoinedRoom">{{chatStorage.selfIdentifier.nickname}}</b>{{this.chatRoom.nicknameStringAggregation}}
       </div>
     </div>
   </div>
@@ -22,7 +22,7 @@
     <ol class="chat">
       <li *ngFor="let message of chatRoom.messages">
         <chat-message *ngIf="message.messageType == messageType.ChatMessage;else notificationMessage" class="chat-message" [message]="message"
-          [identifier]="selfIdentifier.identifier"></chat-message>
+          [identifier]="chatStorage.selfIdentifier.identifier"></chat-message>
         <ng-template #notificationMessage>
           <password-request-notification *ngIf="message.messageType == messageType.RoomJoinRequest;else genericNotification" [notificationMessage]="message"></password-request-notification>
           <ng-template #genericNotification>

@@ -1,0 +1,55 @@
+@import 'themes.scss';
+
+@mixin btn-outline-light() {
+   color: $light-background-color;
+   background-image: none;
+   background-color: transparent;
+   border-color: $light-background-color;
+   &:hover {
+      background-color: $light-background-color;
+      color: $light-foreground-color;
+   }
+   &.active {
+      background-color: $light-background-color;
+      color: $light-foreground-color;         
+   }
+   &.active:hover {
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, .5);
+   }
+   &.focus {
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, .5) !important;
+   }
+}
+
+@mixin btn-outline-dark() {
+   color: $dark-menu-color;
+   background-image: none;
+   background-color: transparent;
+   border-color: $dark-menu-color;
+   &:hover {
+      background-color: $dark-menu-color;
+      color: $dark-foreground-color;
+   }
+   &.active {
+      background-color: $dark-menu-color;
+      color: $dark-foreground-color;
+   }
+   &.active:hover {
+      box-shadow: 0 0 0 2px rgba(115, 117, 116, .5);
+   }
+   &.focus {
+      box-shadow: 0 0 0 2px rgba(115, 117, 116, .5) !important;
+   }   
+}
+
+:host-context(.dark-theme) {
+   .btn-outline-themed {
+      @include btn-outline-light();
+   }
+}
+
+:host-context(.light-theme) {
+   .btn-outline-themed {
+      @include btn-outline-dark();
+   }
+}

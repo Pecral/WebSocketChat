@@ -41,17 +41,25 @@ export class ChatRoomOverviewComponent implements OnInit {
    navigateToRoom(requestedRoom: ChatRoom): void  {
       //if the requested room is already the current room, we will just set the chatroom-pane as the active pane
       //otherwise we will navigate to the chatroom
-      if(this.navigation.currentRoom.roomIdentifier == requestedRoom.roomIdentifier) {
-         this.navigation.chatIsActiveWindow = true;
-      }
-      else {
-         this.router.navigate(['/chatroom', requestedRoom.roomIdentifier]);
-      }
+      // if(this.navigation.currentRoom.roomIdentifier == requestedRoom.roomIdentifier) {
+      //    this.navigation.chatIsActiveWindow = true;
+      // }
+      // else {
+      //    this.router.navigate(['/chatroom', requestedRoom.roomIdentifier]);
+      // }
+
+      this.router.navigate(['/chatroom', requestedRoom.roomIdentifier]);
    }
 
    /** Navigate to settings */
    navigateToSettings(): void {
+      this.navigation.chatIsActiveWindow = true;
       this.router.navigate(['/settings']);
+   }
+
+   navigateToRoomCreation(): void {
+      this.navigation.chatIsActiveWindow = true;
+      this.router.navigate(['/room-creation', 'user-invitation']);
    }
 
    /** Get the room's last message depending on its type */

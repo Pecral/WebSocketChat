@@ -163,7 +163,6 @@
 .chat-messages {
    overflow-x: hidden;
    overflow-y: scroll;
-   background-color: #252C33;
    height: 100%;
    order: 2;
 }
@@ -196,21 +195,49 @@
 
 /* T Y P E */
 
-.chat-input {
-   order: 3;
-   flex: 0 0 45px;
-   width: 100%;
-   height: 50px;
-   z-index: 99;
-   background: #fafafa;
-   border: none;
-   outline: none;
-   padding-left: 10px;
-   padding-right: 55px;
-   color: #666;
-   font-weight: 400;
+.input-wrapper {
+  order:3;
+  padding: 8px 8px 6px 5px;
 }
 
+.chat-input {
+   height: 50px;
+   z-index: 99;
+   padding-left: 10px;
+   padding-right: 55px;
+   border-radius:5px;
+   transition: border-color 300ms ease-in-out;
+}
+
+@mixin placeholder {
+  ::-webkit-input-placeholder {@content}
+  :-moz-placeholder           {@content}
+  ::-moz-placeholder          {@content}
+  :-ms-input-placeholder      {@content}  
+}
+
+:host-context(.dark-theme) {
+  .chat-input {
+    background-color: lighten($dark-background-color, 10%);
+    color: $dark-foreground-color;
+    border-color: $dark-menu-color;
+
+    &:focus,&:hover {
+      border-color: darken($dark-menu-color, 10%);
+    }
+  }
+}
+
+:host-context(.light-theme) {
+  .chat-input {
+    background-color: lighten($light-background-color, 20%);
+    color: $dark-menu-color;    
+
+    &:focus,&:hover {
+      border-color: $dark-menu-color;
+    }    
+  }
+}
 
 /* R E S P O N S I V E   C O N F I G U R A T I O N
 

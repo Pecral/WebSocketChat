@@ -1,4 +1,6 @@
 @import 'themes';
+@import 'bootstrap-extensions/button-outline-themed';
+
 :host {
     display: flex;
     flex-direction: column;
@@ -34,30 +36,10 @@ button.settings {
     margin-left: auto;
     margin-right: 12px;
     padding: 0.1rem .5rem;
-    background-color: $dark-menu-color;
-    border: 1px solid $light-background-color;
-    box-shadow: 0 0 0 0px;
     cursor:pointer;
-    
-    i {
-        color: $light-background-color;
-    }
 
     &:focus i {
-        animation: fa-spin 2s infinite linear;
-    }
-}
-
-
-:host-context(.dark-theme) {
-    button.settings {
-
-    }
-}
-
-:host-context(.light-theme) {
-    button.settings {
-
+        animation: fa-spin 4s infinite linear;
     }
 }
 
@@ -70,7 +52,7 @@ button.settings {
 /* Room-List */
 
 .room-overview-list {
-    padding-top: 12px;
+    padding-top: 7px;
     flex: 1 1 auto;
     display: flex;
     flex-direction: column;
@@ -184,8 +166,4 @@ button.settings {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.room-creation-button button {
-    cursor: pointer;
 }

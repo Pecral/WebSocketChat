@@ -7,8 +7,8 @@ export class ChatStorageService {
    /** user-instance of ourself */
    selfIdentifier: ChatUser;
 
-   /** dictionary of all connected users */
-   userDictionary: Map<string, ChatUser>;
+   /** list all connected users */
+   userList: Array<ChatUser>;
 
    /** list of all available chat rooms */
    roomList : Array<ChatRoom> = [];

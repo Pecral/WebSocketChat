@@ -1,3 +1,5 @@
+import { RoomRemovalMessage } from './../models/chat/messages/room-removal-message';
+import { Router } from '@angular/router';
 import { ChatStorageService } from './../settings/chat-storage.service';
 import { ImageBase64Encoder } from './../helper/ImageBase64Encoder';
 import { RoomCreationRequest } from './../models/chat/messages/room-creation-request';
@@ -25,6 +27,7 @@ export class ChatService {
    userDictionary: Map<string, ChatUser> = new Map<string, ChatUser>();
    roomDictionary: Map<number, ChatRoom> = new Map<number, ChatRoom>();
    roomList: Array<ChatRoom> = [];
+   userList: Array<ChatUser> = [];
 
    //save global room in additional variable for easier access
    globalRoom: ChatRoom;
@@ -32,10 +35,10 @@ export class ChatService {
 
    selfIdentifierChanged: EventEmitter<ChatUser> = new EventEmitter<ChatUser>();
 
-   constructor(private chatStorage: ChatStorageService) {
+   constructor(private chatStorage: ChatStorageService, private router: Router) {
       //save instances of user dictionary and room list in chat storage
       this.chatStorage.roomList = this.roomList;
-      this.chatStorage.userDictionary = this.userDictionary;
+      this.chatStorage.userList = this.userList;
 
       //create dummy global room
       this.globalRoom = new ChatRoom();
@@ -74,7 +77,7 @@ export class ChatService {
    }
 
    /** Pass message into the websocket */
-   sendMessage(message: ChatMessage | NicknameRequest): void {
+   sendMessage(message: ChatMessage | NicknameRequest | RoomCreationRequest): void {
       this.webSocket.next(message);
    }
 
@@ -113,7 +116,38 @@ export class ChatService {
             case MessageType.RoomJoinRequest:
                let joinRequest = Object.assign(new RoomJoinRequest(), messageModel);
                this.handleRoomJoinRequest(joinRequest);
+               break;
+               
+            case MessageType.RoomCreationRequest:
+               let newRoom = Object.assign(new RoomCreationRequest(), messageModel);
+               this.handleNewRoom(newRoom);
+               break;
+
+            case MessageType.RoomRemovalMessage:
+               let removalMessage = Object.assign(new RoomRemovalMessage(), messageModel);
+               if(this.roomDictionary.has(removalMessage.roomIdentifier)) {
+                  let removedRoom = this.roomDictionary.get(removalMessage.roomIdentifier);
+                  this.roomDictionary.delete(removalMessage.roomIdentifier);
+                  let removedRoomIndex = this.roomList.indexOf(removedRoom);
+                  this.roomList = this.roomList.slice(removedRoomIndex, 1);
+               }
+               break;
          }
+      }
+   }
+
+   /** Handles a new room which has been created */
+   private handleNewRoom(roomInformation: RoomCreationRequest):void {
+      let room = Object.assign(new ChatRoom(), roomInformation.requestedRoom);
+      room.hasJoinedRoom = room.connectedUsers.some(x => x == this.selfIdentifier.identifier);
+      this.roomDictionary.set(room.roomIdentifier, room);
+      this.roomList.push(room);
+      this.roomList = this.roomList.slice();
+      this.updateNicknameStringAggregation(room.roomIdentifier);
+
+      //if we were the one that created this room, we will navigate to it
+      if(roomInformation.senderGuid == this.selfIdentifier.identifier) {
+         this.router.navigate(["/chatroom", room.roomIdentifier]);
       }
    }
 
@@ -121,7 +155,12 @@ export class ChatService {
    private handleServerInformation(serverInformation: ServerInformationMessage): void {
       for (let userKey in serverInformation.userDictionary) {
          this.userDictionary.set(userKey, serverInformation.userDictionary[userKey]);
+         if(!this.userList.some(x => x.identifier == userKey)) {
+            this.userList.push(serverInformation.userDictionary[userKey]);
+         }
       }
+
+      this.userList = this.userList.slice();
 
       for (let roomKey in serverInformation.availableRooms) {
          //temporary parseint because the typescript compiler marked roomKey as an string even though "availableRooms" has a number as a key
@@ -178,6 +217,11 @@ export class ChatService {
 
          //add user to dictionary if it's a new user
          this.userDictionary.set(joinMessage.chatUser.identifier, joinMessage.chatUser);
+         this.userList.push(joinMessage.chatUser);
+         // if a user joins/leave the server, we will create a new instance of userList in the shared chat-storage to trigger the change detection.
+         // of course, this can be done a lot better with ChangeDetectorRef, but it's fine for now.
+         this.userList = this.userList.slice();
+         this.chatStorage.userList = this.userList;
       }
 
       let targetRoom = this.roomDictionary.get(joinMessage.roomIdentifier);
@@ -216,6 +260,10 @@ export class ChatService {
 
          //remove from user dictionary
          this.userDictionary.delete(message.senderGuid);
+         // if a user joins/leave the server, we will create a new instance of userList in the shared chat-storage to trigger the change detection.
+         // of course, this can be done a lot better with ChangeDetectorRef, but it's fine for now.
+         this.userList = this.userList.filter(x => x.identifier != message.senderGuid).slice();
+         this.chatStorage.userList = this.userList;
       }
       else {
          //remove user from room

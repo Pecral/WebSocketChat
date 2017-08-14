@@ -1,4 +1,4 @@
-<p class="notification {{this.notificationMessage.messageType == messageType.RoomJoinRequest ? 'alert attention-heartbeat' : ''}}">
+<p class="notification swing-in-top-fwd {{this.notificationMessage.messageType == messageType.RoomJoinRequest ? 'alert attention-heartbeat' : ''}}">
    <span class="content">{{getMessage()}}</span>
    <time>{{formatDate(notificationMessage.timestamp, "HH:mm")}}</time>
 </p>

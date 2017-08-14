@@ -1,0 +1,24 @@
+<div class="form-group">
+  <label>Room Name:</label>
+  <input type="text" class="form-control {{(!showInvalidRoomNameError || isRoomNameValid()) ? '' : 'input-error'}}" (keyup)="showInvalidRoomNameError = true"
+    (focusout)="showInvalidRoomNameError = true" [(ngModel)]="this.roomToCreate.name" />
+</div>
+<div class="form-group">
+  <label>Description (optional):</label>
+  <input type="text" class="form-control" [(ngModel)]="this.roomToCreate.description">
+</div>
+<div class="form-group">
+  <label>Password (optional):</label>
+  <input type="password" class="form-control" [(ngModel)]="this.roomToCreate.password">
+</div>
+<label class="btn btn-outline-themed avatar-upload-button">
+  Choose Avatar <input type="file" accept="image/*" (change)="onRoomAvatarUpload($event)" hidden>
+ </label>
+
+<div class="room-avatar-wrapper">
+  <img class="room-avatar swing-in-top-fwd" [src]="this.roomToCreate.roomAvatarBase64" />
+</div>
+
+<div class="room-creation-button">
+  <button class="btn btn-outline-themed" (click)="createRoom()"><i class="fa fa-check" aria-hidden="true"></i></button>
+</div>

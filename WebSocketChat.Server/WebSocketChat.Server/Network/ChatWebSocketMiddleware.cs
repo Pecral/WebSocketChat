@@ -160,9 +160,9 @@ namespace WebSocketChat.Server.Network
 
                     case MessageType.RoomCreationRequest:
                         RoomCreationRequest roomRequest = jsonMessage.ToObject<RoomCreationRequest>();
-                        ChatRoom newRoom = CreateNewChatRoom(roomRequest.RequestedRoom);
+                        roomRequest.RequestedRoom = CreateNewChatRoom(roomRequest.RequestedRoom);
 
-                        await InviteUsersToRoom(newRoom);
+                        await InviteUsersToRoom(roomRequest, true);
                     break;
 
                     case MessageType.NicknameRequest:
@@ -227,7 +227,7 @@ namespace WebSocketChat.Server.Network
                     };
 
                     await sendRequestResult(true);
-                    await InformUsersAboutJoin(joinMessage);
+                    await InformUsersAboutJoin(joinMessage, joinRoom);
                 }
                 else
                 {
@@ -270,8 +270,14 @@ namespace WebSocketChat.Server.Network
                     targetRoom.ConnectedUsers.Add(sender);
                     targetRoom.ConnectedUsers.Add(recipient);
 
+                    RoomCreationRequest request = new RoomCreationRequest()
+                    {
+                        RequestedRoom = targetRoom,
+                        SenderGuid = sender
+                    };
+
                     //inform the two users about the new room
-                    await InviteUsersToRoom(targetRoom);
+                    await InviteUsersToRoom(request, false);
                 }
 
                 await SendMessageIntoRoom(targetRoom, messageContent);
@@ -284,14 +290,19 @@ namespace WebSocketChat.Server.Network
         /// <param name="room"></param>
         /// <param name="userIdentifier"></param>
         /// <returns></returns>
-        private async Task InviteUsersToRoom(ChatRoom room)
+        private async Task InviteUsersToRoom(RoomCreationRequest message, bool showRoomToAll)
         {
-            RoomInformationMessage message = new RoomInformationMessage();
-            message.ChatRoom = room;
-
             string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
 
-            await SendMessageIntoRoom(room, serialized);
+            if(showRoomToAll)
+            {
+                await SendMessageIntoRoom(_globalRoom, serialized);
+            }
+            else
+            {
+                await SendMessageIntoRoom(message.RequestedRoom, serialized);
+            }
+            
         }
 
         /// <summary>
@@ -302,7 +313,7 @@ namespace WebSocketChat.Server.Network
         /// <returns></returns>
         private async Task SendMessageIntoRoom(ChatRoom room, string message)
         {
-            List<string> usersCopy = room.ConnectedUsers.ToList();
+            List<string> usersCopy = room.ConnectedUsers.Except(_queuedUsersToDisconnect).ToList();
 
             await Task.WhenAll(usersCopy.Select(userIdentifier =>
             {
@@ -344,7 +355,7 @@ namespace WebSocketChat.Server.Network
                 ChatUser = newChatPartner
             };
 
-            await InformUsersAboutJoin(joinMessage);
+            await InformUsersAboutJoin(joinMessage, _globalRoom);
         }
 
         /// <summary>
@@ -364,10 +375,9 @@ namespace WebSocketChat.Server.Network
             //delete the room if it's empty (the global room can't be removed)
             if (room.RoomIdentifier != 0 && room.ConnectedUsers.Count == 0)
             {
-                ChatRoom dummy;
                 lock(_userRemovalLockObject)
                 {
-                    _chatrooms.TryRemove(room.RoomIdentifier, out dummy);
+                    _chatrooms.TryRemove(room.RoomIdentifier, out ChatRoom dummy);
                 }   
             }
 
@@ -393,15 +403,20 @@ namespace WebSocketChat.Server.Network
         /// </summary>
         /// <param name="message"></param>
         /// <returns></returns>
-        private async Task InformUsersAboutJoin(UserJoinMessage message)
+        private async Task InformUsersAboutJoin(UserJoinMessage message, ChatRoom targetRoom)
         {
             //send the joining user his user name and all other users that he joined the server
-            await Task.WhenAll(_sockets.Select(socket =>
+            await Task.WhenAll(targetRoom.ConnectedUsers.Select(userKey =>
             {
-                message.IsOriginOfMessage = socket.Key == message.SenderGuid;
-                string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
+                if(_sockets.TryGetValue(userKey, out ChatPartner user))
+                {
+                    message.IsOriginOfMessage = user.Identifier == message.SenderGuid;
+                    string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
 
-                return SendStringAsync(socket.Value.WebSocket, socket.Key, serialized, CancellationToken.None);
+                    return SendStringAsync(user.WebSocket, user.Identifier, serialized, CancellationToken.None);
+                }
+
+                return Task.CompletedTask;
             }).ToArray());
         }
 
@@ -442,15 +457,44 @@ namespace WebSocketChat.Server.Network
         /// Removes a specific user from all chat rooms
         /// </summary>
         /// <param name="userIdentifier"></param>
-        public void RemoveUserFromAllChatRooms(string userIdentifier)
+        public async Task RemoveUserFromAllChatRooms(string userIdentifier)
         {
-            foreach (var room in _chatrooms)
+            foreach (var roomEntry in _chatrooms)
             {
-                if (room.Value.ConnectedUsers.Contains(userIdentifier))
+                var room = roomEntry.Value;
+                if (room.ConnectedUsers.Contains(userIdentifier))
                 {
-                    room.Value.ConnectedUsers.Remove(userIdentifier);
+                    room.ConnectedUsers.Remove(userIdentifier);
+
+                    await RemoveRoomIfEmpty(room);
                 }
             }
+        }
+
+        /// <summary>
+        /// Removes the given room if it's empty and informs the global room about the removal of the room
+        /// </summary>
+        /// <param name="room"></param>
+        /// <returns></returns>
+        public async Task RemoveRoomIfEmpty(ChatRoom room)
+        {
+            //delete the room if it's empty (the global room can't be removed)
+            if (room.ConnectedUsers.Count == 0 && room.RoomIdentifier != 0)
+            {
+                lock (_userRemovalLockObject)
+                {
+                    //we can safely remove it within the foreach 'cause it's an concurrent-dictionary
+                    _chatrooms.TryRemove(room.RoomIdentifier, out ChatRoom dummy);
+                }
+
+                //inform global room about deleted room
+                RoomRemovalMessage message = new RoomRemovalMessage();
+                message.RoomIdentifier = room.RoomIdentifier;
+
+                string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
+                await SendMessageIntoRoom(_globalRoom, serialized);
+            }
+
         }
 
         /// <summary>
@@ -479,13 +523,10 @@ namespace WebSocketChat.Server.Network
             {
                 try
                 {
-                    lock (_userRemovalLockObject)
-                    {
-                        RemoveUserFromAllChatRooms(userIdentifier);
-                        Task closeTask = user.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
-                        closeTask.Wait();
-                        user.WebSocket.Dispose();
-                    }
+                    await RemoveUserFromAllChatRooms(userIdentifier);
+                    Task closeTask = user.WebSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Closing", CancellationToken.None);
+                    closeTask.Wait();
+                    user.WebSocket.Dispose();
                 }
                 catch(Exception ex)
                 {

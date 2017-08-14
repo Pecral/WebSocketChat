@@ -19,6 +19,10 @@
    &.focus {
       box-shadow: 0 0 0 2px rgba(255, 255, 255, .5) !important;
    }
+
+   &:focus {
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, .5);
+   }
 }
 
 @mixin btn-outline-dark() {
@@ -39,7 +43,19 @@
    }
    &.focus {
       box-shadow: 0 0 0 2px rgba(115, 117, 116, .5) !important;
-   }   
+   }
+   
+   &:focus {
+      box-shadow: 0 0 0 2px rgba(115, 117, 116, .5);
+   }
+}
+
+.btn-outline-dark {
+   @include btn-outline-dark();
+}
+
+.btn-outline-light {
+   @include btn-outline-light();
 }
 
 :host-context(.dark-theme) {

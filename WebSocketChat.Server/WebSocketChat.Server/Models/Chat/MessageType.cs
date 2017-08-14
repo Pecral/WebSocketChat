@@ -14,6 +14,7 @@ namespace WebSocketChat.Server.Models.Chat
 
         RoomJoinRequest,
         RoomCreationRequest,
+        RoomRemovalMessage,
         RoomInformation,
 
         RequestConnections,

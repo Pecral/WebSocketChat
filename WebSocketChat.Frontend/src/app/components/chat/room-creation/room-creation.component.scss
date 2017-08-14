@@ -1,0 +1,74 @@
+@import 'themes.scss';
+@import 'bootstrap-extensions/button-outline-themed';
+
+:host {
+   display: flex;
+   flex-direction: column;
+   align-items: stretch;
+   white-space: nowrap;
+   position: relative;
+   height: 100%;
+}
+
+//hide component if we're not in the active pane in mobile mode
+@media (max-width: 768px) {
+   :host-context(.middle-pane:not(.active)) .content {
+      display: none !important;
+   }
+}
+
+:host-context(.dark-theme) {
+   .content {
+      color: $dark-foreground-color;
+   }
+}
+
+:host-context(.light-theme) {
+   .content {
+      color: $light-foreground-color;
+   }
+}
+
+.content {
+   flex: 1 1 auto;
+   padding: 8px 15px;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+
+   .step-wrapper {
+      flex: 1 1 auto;
+      align-self: stretch;   
+      display:flex;
+      flex-direction: column;   
+   }
+}
+
+.menu-header {
+   flex: 0 0 60px;
+   display: flex;
+   align-items: center;
+   color: $dark-foreground-color;
+   background-color: $dark-menu-color;
+   padding: 15px;
+   & .back {
+      height: 50px;
+      color: rgba(255, 255, 255, 0.5);
+      line-height: 45px;
+      font-size: 40px;
+      cursor: pointer;
+      transition: .15s all;
+      padding-left: 15px;
+      padding-right: 30px;
+   }
+   @media (min-width: 768px) {
+      & .back {
+         display: none;
+      }
+   }
+}
+
+.no-user-placeholder {
+    font-size: 23px;
+    text-align: center;
+}

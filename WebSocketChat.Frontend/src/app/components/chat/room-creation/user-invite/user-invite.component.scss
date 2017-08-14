@@ -1,0 +1,162 @@
+@import 'themes.scss';
+
+.slimscroll-wrapper {
+   flex: 1 1 auto;
+}
+
+/* Chatuser selection list */
+
+#usersToInvite {
+   width: 100%;
+   padding-left: 72px;
+}
+
+
+.user-invite-list {
+   padding-bottom: 6px;
+   padding-top: 7px;
+}
+
+.user-overview-list {
+   flex: 1 1 auto;
+   display: flex;
+   flex-direction: column;
+   align-items: stretch;
+   align-self: stretch;
+   //overflow-y: scroll;
+}
+
+.user-item {
+   flex: 0 0 65px;
+   display: flex;
+   flex-direction: row;
+   cursor:pointer;
+   transition: background-color 300ms ease-in-out, color 300ms ease-in-out;
+
+   i.fa-check {
+      padding-right: 10px;
+      align-self: center;
+   }
+}
+
+:host-context(.dark-theme) {
+   .user-item:hover,
+   .user-item.active {
+      background-color: $dark-foreground-color;
+      color: $dark-menu-color;
+   }
+}
+
+:host-context(.light-theme) {
+   .user-item:hover,
+   .user-item.active {
+      background-color: darken($light-background-color, 5%);
+      color: #1c242b;
+   }
+}
+
+.user-item:last-child .user-body {
+   border-bottom: 1px solid #969696;
+}
+
+.user-body {
+   flex: 1 1 auto;
+   border-top: 1px solid #969696;
+   display: flex;
+   flex-direction: row;
+   justify-content: space-between;
+   align-items: stretch;
+}
+
+.avatar {
+   flex: 0 0 72px;
+   display: flex;
+   align-items: center;
+   padding: 0 12px;
+   justify-content: center;
+}
+
+.avatar-image {
+   width: 50px;
+   height: 50px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+}
+
+.avatar img {
+   border: 1px solid #969696;
+   vertical-align: middle;
+}
+
+.avatar.self img {
+   width: 40px;
+   height: 40px;
+}
+
+.avatar-user-placeholder {
+   font-size: 2em;
+}
+
+.user-meta {
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+}
+
+.user-name {
+   font-weight: 700;
+}
+
+.user-body,
+.user-meta {
+   overflow: hidden;
+   text-overflow: ellipsis;
+}
+
+/* contact chip */
+
+.chip {
+   display: inline-block;
+   height: 32px;
+   font-weight: 500;
+   line-height: 32px;
+   padding: 0 12px;
+   border-radius: 16px;
+   margin-bottom: 5px;
+   margin-right: 5px;
+   background-color: lighten($dark-menu-color, 5%);
+   border: 1px solid $dark-background-color;
+   color: $dark-foreground-color;
+
+   img.chip-image, span.chip-image {
+      float: left;
+      height: 31px;
+      width: 32px;
+      border-radius: 50%;
+      text-align: center;
+   }
+
+   img.chip-image {
+      margin: 0 8px 0 -12px;
+   }
+
+   span.chip-image {
+      font-size: 20px;
+      margin: 0 0px 0 -12px;
+   }
+
+   .chip-remove {
+      cursor: pointer;
+      float: right;
+      font-size: 16px;
+      line-height: 32px;
+      padding-left: 8px;
+   }
+}
+
+:host-context(.dark-theme) {
+   .chip {
+      border: 1px solid $dark-foreground-color;
+   }
+}

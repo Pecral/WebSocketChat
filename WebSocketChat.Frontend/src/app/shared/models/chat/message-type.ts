@@ -6,6 +6,7 @@ export enum MessageType {
 
     RoomJoinRequest,
     RoomCreationRequest,
+    RoomRemovalMessage,
     RoomInformation,
 
     RequestConnections,

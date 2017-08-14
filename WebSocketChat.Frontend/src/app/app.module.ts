@@ -1,3 +1,4 @@
+
 /** Angular Modules  */
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
@@ -9,6 +10,15 @@ import { RouterModule, Routes } from '@angular/router';
 import { SplitPaneModule } from 'ng2-split-pane/lib/ng2-split-pane';
 import { NgxAutoScroll } from 'ngx-auto-scroll/lib/ngx-auto-scroll.directive';
 import { VirtualScrollModule } from 'angular2-virtual-scroll';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
+
+const PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
+  suppressScrollX: true
+};
+
+/** PrimeNG */
+import { ChipsModule, StepsModule } from 'primeng/primeng';
 
 /** Components */
 import { AppComponent } from './app.component';
@@ -19,6 +29,9 @@ import { ChatMessageComponent } from './components/chat/message/chat-message.com
 import { ChatComponent } from './components/chat/chat.component';
 import { ChatRoomOverviewComponent } from './components/chat/room-overview/room-overview.component';
 import { SettingsComponent } from './components/chat/settings/settings.component';
+import { ChatRoomCreationComponent } from './components/chat/room-creation/room-creation.component';
+import { RoomDefinitionComponent } from './components/chat/room-creation/room-definition/room-definition.component';
+import { UserInviteComponent } from './components/chat/room-creation/user-invite/user-invite.component';
 
 /** Services  */
 import { ChatService } from './shared/services/websocket-chat.service';
@@ -27,10 +40,12 @@ import { ChatStorageService } from './shared/settings/chat-storage.service';
 
 /** Pipes */
 import { MapPipe } from './shared/pipes/map.pipe';
+import { SelfIdentifierFilterPipe } from './components/chat/room-creation/user-invite/self-identifier-filter.pipe';
 
 const appRoutes: Routes = [
   { path: 'chatroom/:id', component: ChatRoomComponent },
   { path: 'settings', component: SettingsComponent },
+  { path: 'room-creation/:step',component: ChatRoomCreationComponent },
   { path: '', redirectTo: 'chatroom/1', pathMatch: 'full'}
 ];
 
@@ -44,10 +59,14 @@ const appRoutes: Routes = [
     ChatNotificationComponent,
     PasswordRequestNotificationComponent,
     ChatRoomOverviewComponent,
+    ChatRoomCreationComponent,
+    UserInviteComponent,
+    RoomDefinitionComponent,
     SettingsComponent,
 
     /** Pipes */
     MapPipe,
+    SelfIdentifierFilterPipe,
     
     /** Directives */
     NgxAutoScroll
@@ -61,7 +80,12 @@ const appRoutes: Routes = [
 
     /** 3rd party */
     SplitPaneModule,
-    VirtualScrollModule
+    VirtualScrollModule,
+    PerfectScrollbarModule,
+
+    /** PrimeNG */
+    ChipsModule,
+    StepsModule
   ],
   providers: [ChatService, NavigationService, ChatStorageService],
   bootstrap: [AppComponent]

@@ -1,0 +1,19 @@
+<div class="menu-header">
+   <div class="back" (click)="exitRoomCreation()">
+      <i class="fa fa-angle-left"></i>
+   </div>
+   <p-steps styleClass="steps-custom-theme" class="steps-custom-theme" [(activeIndex)]="activeIndex" [model]="items" [readonly]="false" (activeIndexChange)="changeCreationStep()" ></p-steps>
+</div>
+<div class="content">
+   <div class="user-invitation step-wrapper" *ngIf="activeIndex == 0">
+
+      <user-invite *ngIf="this.chatStorage.userList.length > 1;else noUserPlaceholder" [roomToCreate]="roomToCreate"></user-invite>
+      <ng-template #noUserPlaceholder>
+         <span class="no-user-placeholder">Sorry, you are alone on this server.</span>
+      </ng-template>
+   </div>
+
+   <div class="room-definition step-wrapper" *ngIf="activeIndex == 1">
+      <room-definition [roomToCreate]="roomToCreate"></room-definition>
+   </div>
+</div>

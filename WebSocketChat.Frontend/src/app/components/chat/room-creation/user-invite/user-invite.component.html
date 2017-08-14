@@ -1,0 +1,33 @@
+<perfect-scrollbar *ngIf="usersToInvite.length > 0" class="user-invite-list">
+    <div class="chip fade-in-right" *ngFor="let user of usersToInvite">
+       <img *ngIf="user.avatarBase64;else userAvatarFallback chip-image" [src]="user.avatarBase64" />
+       <ng-template #userAvatarFallback>
+          <span class="chip-image"><i class="fa fa-user" aria-hidden="true"></i></span>
+       </ng-template>
+       <span class="chip-content">
+          {{user.nickname}}
+       </span>
+       <i (click)="toggleUserInvite(user)" class="fa fa-times chip-remove"></i>
+    </div>
+</perfect-scrollbar>
+
+<perfect-scrollbar class="user-overview-list">
+ <!-- <virtual-scroll [items]="chatStorage.userList" (update)="viewPortUsers = $event"> -->
+    <div *ngFor="let user of chatStorage.userList | selfIdentifierFilter" (click)="toggleUserInvite(user)" class="user-item swing-in-top-fwd {{(usersToInvite.includes(user) ? 'active' : '')}}">
+       <div class="avatar">
+          <img *ngIf="user.avatarBase64;else userAvatarFallback" class="avatar-image" [src]="user.avatarBase64" />
+          <ng-template #userAvatarFallback>
+             <span class="avatar-image"><i class="avatar-user-placeholder fa fa-user" aria-hidden="true"></i></span>
+          </ng-template>
+       </div>
+
+       <div class="user-body">
+          <div class="user-meta">
+             <span class="user-name">{{user.nickname}}</span>
+          </div>
+          <i *ngIf="usersToInvite.includes(user)" class="fa fa-check fade-in-left"></i>
+       </div>
+
+    </div>
+ <!-- </virtual-scroll> -->
+</perfect-scrollbar>

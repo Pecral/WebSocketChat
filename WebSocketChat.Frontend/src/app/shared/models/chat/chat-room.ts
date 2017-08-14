@@ -48,4 +48,7 @@ export class ChatRoom {
 
 	/** If the user fails to type in the correct password to join the room, we will fire this event so that the UI can react.. */
 	failedJoinRequest: Subject<any> = new Subject();
+
+	/** Client-side only, will be used for room creation and reconnection */
+	password: string;
 }

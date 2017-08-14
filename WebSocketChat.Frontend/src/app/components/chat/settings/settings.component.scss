@@ -1,6 +1,10 @@
 @import 'themes.scss';
 @import 'bootstrap-extensions/button-outline-themed';
 
+h1, h2, h3, h4 {
+    padding-bottom: 10px;
+}
+
 :host {
     display: flex;
     flex-direction: column;
@@ -8,6 +12,13 @@
     white-space: nowrap;
     position: relative;
     height: 100%;   
+}
+
+//hide component if we're not in the active pane in mobile mode
+@media (max-width: 768px) {
+    :host-context(.middle-pane:not(.active)) .content {
+        display: none !important;
+    }
 }
 
 :host-context(.dark-theme) {
@@ -25,6 +36,9 @@
 .content {
     flex: 1 1 auto;
     padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 .menu-header {
@@ -52,13 +66,13 @@
     }    
 }
 
-
-
 .message-theme-wrapper {
     display: flex;
     flex-direction: row;
     flex-wrap: wrap;
+    align-self: stretch;
     align-items: center;
+    justify-content: center;
 }
 
 .message-theme-options {
@@ -75,8 +89,8 @@
     border-top: 1px solid darken($dark-foreground-color, 20%);
     border-bottom: 1px solid darken($dark-foreground-color, 20%);
     display: flex;
+    flex: 0 1 250px;
     flex-direction: column;
-    flex: 0 0 250px;
     margin-left: 20px;   
     
     & chat-message {

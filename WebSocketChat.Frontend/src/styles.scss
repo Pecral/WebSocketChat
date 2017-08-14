@@ -3,44 +3,78 @@
 @import 'bootstrap-extensions/button-outline-themed.scss';
 
 /* You can add global styles to this file, and also import other style files */
-html, body {
-    font-family: 'Lato', sans-serif;
-    margin: 0px auto;
-    height:100%;
+
+html,
+body {
+   font-family: $default-font;
+   margin: 0px auto;
+   height: 100%;
+}
+
+
+/* General bootstrap theme overrides */
+
+.form-group {
+   label {
+      font-weight: 700;
+   }
+}
+
+.btn {
+   cursor:pointer;
 }
 
 // * {
 //   transition: color 500ms ease-in-out, background-color 500ms ease-in-out;
 // }
 
-/* Animations */
+/* Custom theme for PrimeNG Steps */
 
-.fade-in-left {
-    animation: fade-in-left 0.3s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
+.ui-widget {
+   font-family: $default-font;
 }
 
-@keyframes fade-in-left {
-  0% {
-  transform: translateX(-50px);
-    opacity: 0;
-  }
-  100% {
-  transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-.fade-in-right {
-    animation: fade-in-right 0.3s cubic-bezier(0.390, 0.575, 0.565, 1.000) both;
-}
-
-@keyframes fade-in-right {
-  0% {
-  transform: translateX(50px);
-    opacity: 0;
-  }
-  100% {
-  transform: translateX(0);
-    opacity: 1;
-  }
+p-steps.steps-custom-theme {
+   width: 100%;
+   .ui-steps.steps-custom-theme {
+      margin-bottom: 20px;
+      & ul {
+         display: flex;
+      }
+      & .ui-steps-item {
+         flex: 1 1 auto;
+      }
+      & .ui-steps-item .ui-menuitem-link {
+         height: 5px;
+         padding: 0 1em;
+      }
+      & .ui-steps-item.ui-state-highlight .ui-steps-number {
+         -webkit-animation: pulsate-fwd 0.5s ease-in-out 2 both;
+         animation: pulsate-fwd 0.5s ease-in-out 2 both;
+      }
+      & .ui-steps-item.ui-state-default .ui-menuitem-link {
+         background-color: $dark-foreground-color;
+      }
+      & .ui-steps-item .ui-steps-number {
+         background-color: #0081c2;
+         color: $dark-foreground-color;
+         display: inline-block;
+         width: 24px;
+         font-size: 16px;
+         border-radius: 50%;
+         top: -9px;
+         position: absolute;
+         left: 0;
+         right: 0;
+         margin: 0 auto;
+      }
+      & .ui-steps-item .ui-steps-title {
+         color: $dark-foreground-color;
+         position: absolute;
+         top: 14px;
+         left: 0;
+         right: 0;
+         margin: 0 auto;
+      }
+   }
 }

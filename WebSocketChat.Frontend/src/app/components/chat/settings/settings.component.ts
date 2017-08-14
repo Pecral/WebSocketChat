@@ -49,7 +49,7 @@ export class SettingsComponent implements OnInit {
 
    /** Exist settings and navigate back to the chat room overview*/
    exitSettings(): void {
-      this.router.navigate(['/chatroom', this.appSettings.currentRoom.roomIdentifier]);
+      //this.router.navigate(['/chatroom', this.appSettings.currentRoom.roomIdentifier]);
       this.appSettings.chatIsActiveWindow = false;
    }
 }

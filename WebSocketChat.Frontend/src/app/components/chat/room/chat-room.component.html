@@ -32,7 +32,9 @@
       </li>
     </ol>
   </div>
-  <input class="chat-input" type="text" placeholder="Type here!" [(ngModel)]="currentMessage" (keyup.enter)="sendMessage(currentMessage)"
-  />
+  <div class="input-wrapper">
+    <input class="chat-input form-control" type="text" placeholder="Type here!" [(ngModel)]="currentMessage"  (keyup.enter)="sendMessage(currentMessage)">
+  </div>
+  
 </div>
 <!--<div class="emojis"></div>-->

@@ -6,7 +6,11 @@ import * as moment from 'moment';
 @Component({
    selector: 'chat-message',
    templateUrl: './chat-message.component.html',
-   styleUrls: ['./chat-message.component.scss']
+   styleUrls: [
+      './chat-message.component.bubble.scss',
+      './chat-message.component.compact.scss',
+      './chat-message.component.irc.scss'
+   ]
 })
 export class ChatMessageComponent implements OnInit {
 

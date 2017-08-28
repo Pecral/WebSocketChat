@@ -14,6 +14,10 @@ namespace WebSocketChat.Server.Models.Chat
             ConnectedUsers = new List<string>();
         }
 
+        /// <summary>
+        /// Specifies whether the room should be removed once all users have left
+        /// </summary>
+        public bool IsStaticRoom { get; set; }
 
         /// <summary>
         /// Identifier of the room. 

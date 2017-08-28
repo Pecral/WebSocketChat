@@ -40,19 +40,23 @@ namespace WebSocketChat.Server.Network
             _globalRoom = CreateNewChatRoom();
             _globalRoom.Name = "Global Room";
             _globalRoom.IsPrivateRoom = false;
+            _globalRoom.IsStaticRoom = true;
             _globalRoom.RoomAvatarBase64 = ImageUrlToBase64Encoder.GetImageAsBase64Url("https://i.imgur.com/G4EjwqQ.jpg");
             
             //dummy rooms
             var offtopicRoom = CreateNewChatRoom();
             offtopicRoom.Name = "Offtopic";
+            offtopicRoom.IsStaticRoom = true;
             offtopicRoom.RoomAvatarBase64 = ImageUrlToBase64Encoder.GetImageAsBase64Url("http://compsci.ca/v3/uploads/user_avatars/10820786614fe1f6d9ccbda.png");
 
             var developmentRoom = CreateNewChatRoom();
             developmentRoom.Name = "Development";
+            developmentRoom.IsStaticRoom = true;
 
             var testRoom = CreateNewChatRoom();
             testRoom.Name = "Test";
             testRoom.Password = "Test";
+            testRoom.IsStaticRoom = true;
 
             _chatrooms.TryAdd(_globalRoom.RoomIdentifier, _globalRoom);
             _next = next;
@@ -160,6 +164,11 @@ namespace WebSocketChat.Server.Network
 
                     case MessageType.RoomCreationRequest:
                         RoomCreationRequest roomRequest = jsonMessage.ToObject<RoomCreationRequest>();
+                        //ensure that the sender is added to the room
+                        if(!roomRequest.RequestedRoom.ConnectedUsers.Any(x => x == roomRequest.SenderGuid))
+                        {
+                            roomRequest.RequestedRoom.ConnectedUsers.Add(roomRequest.SenderGuid);
+                        }
                         roomRequest.RequestedRoom = CreateNewChatRoom(roomRequest.RequestedRoom);
 
                         await InviteUsersToRoom(roomRequest, true);
@@ -373,13 +382,13 @@ namespace WebSocketChat.Server.Network
             }
 
             //delete the room if it's empty (the global room can't be removed)
-            if (room.RoomIdentifier != 0 && room.ConnectedUsers.Count == 0)
-            {
-                lock(_userRemovalLockObject)
-                {
-                    _chatrooms.TryRemove(room.RoomIdentifier, out ChatRoom dummy);
-                }   
-            }
+            //if (room.RoomIdentifier != 0 && room.ConnectedUsers.Count == 0)
+            //{
+            //    lock(_userRemovalLockObject)
+            //    {
+            //        _chatrooms.TryRemove(room.RoomIdentifier, out ChatRoom dummy);
+            //    }   
+            //}
 
             await InformServerAboutLeavingUser(message);
         }
@@ -479,7 +488,7 @@ namespace WebSocketChat.Server.Network
         public async Task RemoveRoomIfEmpty(ChatRoom room)
         {
             //delete the room if it's empty (the global room can't be removed)
-            if (room.ConnectedUsers.Count == 0 && room.RoomIdentifier != 0)
+            if (!room.IsStaticRoom && room.ConnectedUsers.Count == 0 && room.RoomIdentifier != 0)
             {
                 lock (_userRemovalLockObject)
                 {
@@ -494,7 +503,6 @@ namespace WebSocketChat.Server.Network
                 string serialized = JsonConvert.SerializeObject(message, Global.SerializerSettings);
                 await SendMessageIntoRoom(_globalRoom, serialized);
             }
-
         }
 
         /// <summary>

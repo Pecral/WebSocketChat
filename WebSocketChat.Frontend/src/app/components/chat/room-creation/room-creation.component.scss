@@ -50,7 +50,7 @@
    align-items: center;
    color: $dark-foreground-color;
    background-color: $dark-menu-color;
-   padding: 15px;
+   padding-right: 15px;
    & .back {
       height: 50px;
       color: rgba(255, 255, 255, 0.5);
@@ -69,6 +69,6 @@
 }
 
 .no-user-placeholder {
-    font-size: 23px;
+    font-size: 18px;
     text-align: center;
 }

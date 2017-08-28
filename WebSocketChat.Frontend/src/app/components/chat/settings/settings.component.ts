@@ -43,8 +43,11 @@ export class SettingsComponent implements OnInit {
    }
 
    /** Change the design theme of a message */
-   changeMessageTheme(event:any):void {
-      debugger;
+   changeMessageTheme(messageTheme: string):void {
+      //|| messageTheme == "irc" disabled till it's implemented
+      if(messageTheme == "bubble" || messageTheme == "compact") {
+         this.appSettings.messageTheme = messageTheme;
+      }
    }
 
    /** Exist settings and navigate back to the chat room overview*/

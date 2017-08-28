@@ -48,13 +48,19 @@ export class ChatRoomOverviewComponent implements OnInit {
       //    this.router.navigate(['/chatroom', requestedRoom.roomIdentifier]);
       // }
 
+      this.navigation.chatIsActiveWindow = true;
       this.router.navigate(['/chatroom', requestedRoom.roomIdentifier]);
    }
 
    /** Navigate to settings */
    navigateToSettings(): void {
       this.navigation.chatIsActiveWindow = true;
-      this.router.navigate(['/settings']);
+      if(this.router.url == "/settings") {
+         this.router.navigate(['/chatroom', this.navigation.currentRoom.roomIdentifier]);
+      }
+      else {
+         this.router.navigate(['/settings']);
+      }
    }
 
    navigateToRoomCreation(): void {

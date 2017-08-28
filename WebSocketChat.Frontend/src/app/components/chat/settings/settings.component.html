@@ -22,15 +22,15 @@
   <div class="message-theme-wrapper">
     <div class="message-theme-options">
       <label class="radio" (click)="changeMessageTheme('bubble')">
-            <input type="radio" value="bubble" checked>
+            <input type="radio" [(ngModel)]="appSettings.messageTheme" value="bubble">
             <b>Bubble: </b><span>Classic messenger theme.</span>
       </label>
-      <label class="radio" (click)="changeMessageTheme('compact_with_avatars')">
-            <input type="radio" value="compact_with_avatars" disabled>
+      <label class="radio" (click)="changeMessageTheme('compact')">
+            <input type="radio" [(ngModel)]="appSettings.messageTheme" value="compact">
             <b>Clean: </b><span>Compact messages aligned to the left.</span>
       </label>
-      <label class="radio" (click)="changeMessageTheme('classic')">
-            <input type="radio" value="classic" disabled>
+      <label class="radio" (click)="changeMessageTheme('irc')">
+            <input type="radio" [(ngModel)]="appSettings.messageTheme" disabled value="irc">
             <b>Compact: </b><span>The good ol' days of IRC.</span>
       </label>
     </div>

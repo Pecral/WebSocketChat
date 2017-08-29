@@ -5,7 +5,7 @@ import { Injectable } from '@angular/core';
 export class AppSettingsService {
 
    applicationTheme = "light";
-   messageTheme = "irc";
+   messageTheme = "bubble";
    
    currentRoom: ChatRoom;
    chatIsActiveWindow:boolean = true;   

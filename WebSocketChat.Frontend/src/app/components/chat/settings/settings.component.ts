@@ -1,6 +1,6 @@
 import { Router } from '@angular/router';
 import { ChatMessage } from './../../../shared/models/chat/messages/chat-message';
-import { NavigationService } from './../../../shared/settings/navigation.service';
+import { AppSettingsService } from './../../../shared/settings/app-settings.service';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -11,7 +11,7 @@ import { Component, OnInit } from '@angular/core';
 export class SettingsComponent implements OnInit {
 
    constructor(
-      public appSettings: NavigationService,
+      public appSettings: AppSettingsService,
       private router: Router) {
       this.previewMessage = new ChatMessage();
       this.previewMessage.senderGuid = "otherUser";
@@ -44,8 +44,7 @@ export class SettingsComponent implements OnInit {
 
    /** Change the design theme of a message */
    changeMessageTheme(messageTheme: string):void {
-      //|| messageTheme == "irc" disabled till it's implemented
-      if(messageTheme == "bubble" || messageTheme == "compact") {
+      if(messageTheme == "bubble" || messageTheme == "compact" || messageTheme == "irc") {
          this.appSettings.messageTheme = messageTheme;
       }
    }

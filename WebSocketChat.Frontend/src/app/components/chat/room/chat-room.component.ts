@@ -11,10 +11,14 @@ import { ChatMessage } from './../../../shared/models/chat/messages/chat-message
 import { NicknameRequest } from './../../../shared/models/chat/messages/nickname-request';
 import { ChatRoom } from './../../../shared/models/chat/chat-room';
 import { MessageType } from "./../../../shared/models/chat/message-type";
+import { Message } from "./../../../shared/models/chat/message"
 import { PasswordRequestNotificationComponent } from './../notification/password-request-notification/password-request-notification.component';
 
-import { NavigationService } from './../../../shared/settings/navigation.service';
+import { AppSettingsService } from './../../../shared/settings/app-settings.service';
 import { ChatService } from './../../../shared/services/websocket-chat.service';
+
+import * as moment from 'moment';
+;
 
 @Component({
    selector: 'chat-room',
@@ -65,7 +69,7 @@ export class ChatRoomComponent implements OnInit {
       private route: ActivatedRoute,
       private router: Router,
       private chatService: ChatService,
-      private navigation: NavigationService,
+      public appSettings: AppSettingsService,
       public chatStorage: ChatStorageService) {
    }
 
@@ -85,8 +89,8 @@ export class ChatRoomComponent implements OnInit {
          //we can't join private rooms directly..
          if (!this.chatRoom.isPrivateRoom) {
             redirectToGlobalRoom = false;
-            this.navigation.currentRoom = this.chatRoom;
-            this.navigation.chatIsActiveWindow = true;
+            this.appSettings.currentRoom = this.chatRoom;
+            this.appSettings.chatIsActiveWindow = true;
 
             //start join request if we're not already joined
             if (!this.chatRoom.hasJoinedRoom) {
@@ -114,7 +118,6 @@ export class ChatRoomComponent implements OnInit {
 
       return isAvailable;
    }   
-
 
    /** Send a new chat message to the server */
    public sendMessage(message: string) {
@@ -151,7 +154,26 @@ export class ChatRoomComponent implements OnInit {
 
    /** Move back to room-overview */
    triggerNavigateToRoomOverview(): void {
-      this.navigation.chatIsActiveWindow = false;
+      this.appSettings.chatIsActiveWindow = false;
+   }
+
+   /** Returns timestamp in a specific format */
+   formatDate(timestamp: Date, format: string): string {
+      return moment(timestamp).format(format);
+   }
+
+   /** Returns the user's nickname if the message is an instance of ChatMessage, otherwise the sender name will be "*" */
+   getMessageSenderName(message: Message): string {
+      if(message instanceof ChatMessage) {
+         return message.senderName;
+      }
+
+      return "*";
+   }
+
+   /** Returns whether the current message theme is "irc" */
+   isIrcMessageTheme():boolean {
+      return this.appSettings.messageTheme == "irc";
    }
 
 }

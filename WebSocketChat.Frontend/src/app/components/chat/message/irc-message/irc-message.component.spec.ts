@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { ContactChipComponent } from './contact-chip.component';
+import { IrcMessageComponent } from './irc-message.component';
 
-describe('ContactChipComponent', () => {
-  let component: ContactChipComponent;
-  let fixture: ComponentFixture<ContactChipComponent>;
+describe('IrcMessageComponent', () => {
+  let component: IrcMessageComponent;
+  let fixture: ComponentFixture<IrcMessageComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ContactChipComponent ]
+      declarations: [ IrcMessageComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ContactChipComponent);
+    fixture = TestBed.createComponent(IrcMessageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

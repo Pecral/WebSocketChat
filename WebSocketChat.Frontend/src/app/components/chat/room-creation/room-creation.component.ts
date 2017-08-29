@@ -3,7 +3,7 @@ import { ChatRoom } from './../../../shared/models/chat/chat-room';
 import { RoomCreationRequest } from './../../../shared/models/chat/messages/room-creation-request';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ChatUser } from './../../../shared/models/chat/chat-user';
-import { NavigationService } from './../../../shared/settings/navigation.service';
+import { AppSettingsService } from './../../../shared/settings/app-settings.service';
 import { ChatStorageService } from './../../../shared/settings/chat-storage.service';
 import { Component, OnInit } from '@angular/core';
 import { MenuItem } from "primeng/primeng";
@@ -17,7 +17,7 @@ export class ChatRoomCreationComponent implements OnInit {
 
    constructor(
       public chatStorage: ChatStorageService,
-      private navigation: NavigationService,
+      private navigation: AppSettingsService,
       private route: ActivatedRoute,
       private router: Router,
       private chatService: ChatService) { }

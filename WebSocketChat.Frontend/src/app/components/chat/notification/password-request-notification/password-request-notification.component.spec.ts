@@ -3,21 +3,21 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
 
-import { ChatJoinRequestNotificationComponent } from './chat-join-request-notification.component';
+import { PasswordRequestNotificationComponent } from './password-request-notification.component';
 
 describe('ChatJoinRequestNotificationComponent', () => {
-  let component: ChatJoinRequestNotificationComponent;
-  let fixture: ComponentFixture<ChatJoinRequestNotificationComponent>;
+  let component: PasswordRequestNotificationComponent;
+  let fixture: ComponentFixture<PasswordRequestNotificationComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ChatJoinRequestNotificationComponent ]
+      declarations: [ PasswordRequestNotificationComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ChatJoinRequestNotificationComponent);
+    fixture = TestBed.createComponent(PasswordRequestNotificationComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

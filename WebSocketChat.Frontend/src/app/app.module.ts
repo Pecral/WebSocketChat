@@ -26,6 +26,7 @@ import { ChatRoomComponent } from './components/chat/room/chat-room.component';
 import { ChatNotificationComponent } from './components/chat/notification/chat-notification.component';
 import { PasswordRequestNotificationComponent } from './components/chat/notification/password-request-notification/password-request-notification.component';
 import { ChatMessageComponent } from './components/chat/message/chat-message.component';
+import { IrcMessageComponent } from './components/chat/message/irc-message/irc-message.component';
 import { ChatComponent } from './components/chat/chat.component';
 import { ChatRoomOverviewComponent } from './components/chat/room-overview/room-overview.component';
 import { SettingsComponent } from './components/chat/settings/settings.component';
@@ -35,7 +36,7 @@ import { UserInviteComponent } from './components/chat/room-creation/user-invite
 
 /** Services  */
 import { ChatService } from './shared/services/websocket-chat.service';
-import { NavigationService } from './shared/settings/navigation.service';
+import { AppSettingsService } from './shared/settings/app-settings.service';
 import { ChatStorageService } from './shared/settings/chat-storage.service';
 
 /** Pipes */
@@ -55,6 +56,7 @@ const appRoutes: Routes = [
     AppComponent,
     ChatComponent,
     ChatMessageComponent,
+    IrcMessageComponent,
     ChatRoomComponent,
     ChatNotificationComponent,
     PasswordRequestNotificationComponent,
@@ -87,7 +89,7 @@ const appRoutes: Routes = [
     ChipsModule,
     StepsModule
   ],
-  providers: [ChatService, NavigationService, ChatStorageService],
+  providers: [ChatService, AppSettingsService, ChatStorageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

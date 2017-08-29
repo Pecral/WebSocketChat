@@ -12,7 +12,7 @@ import { NicknameRequest } from './../../shared/models/chat/messages/nickname-re
 
 /** Services */
 import { ChatService } from './../../shared/services/websocket-chat.service';
-import { NavigationService } from './../../shared/settings/navigation.service';
+import { AppSettingsService } from './../../shared/settings/app-settings.service';
 
 @Component({
    selector: 'app-chat',
@@ -28,7 +28,7 @@ export class ChatComponent implements OnInit {
 
    constructor(
       private chatService: ChatService,
-      public navigation: NavigationService) {
+      public navigation: AppSettingsService) {
 
    }
 

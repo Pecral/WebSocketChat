@@ -12,6 +12,13 @@ body {
    height: 100%;
 }
 
+.dark-theme {
+   color: $dark-foreground-color;
+}
+
+.light-theme {
+   color: $light-foreground-color;
+}
 
 /* General bootstrap theme overrides */
 

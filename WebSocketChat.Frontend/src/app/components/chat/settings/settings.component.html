@@ -29,9 +29,9 @@
             <input type="radio" [(ngModel)]="appSettings.messageTheme" value="compact">
             <b>Clean: </b><span>Compact messages aligned to the left.</span>
       </label>
-      <label class="radio" (click)="changeMessageTheme('irc')">
-            <input type="radio" [(ngModel)]="appSettings.messageTheme" disabled value="irc">
-            <b>Compact: </b><span>The good ol' days of IRC.</span>
+      <label class="radio hidden-xs-down" (click)="changeMessageTheme('irc')">
+            <input type="radio" [(ngModel)]="appSettings.messageTheme" value="irc">
+            <b>IRC: </b><span>The good ol' days of IRC.</span>
       </label>
     </div>
 

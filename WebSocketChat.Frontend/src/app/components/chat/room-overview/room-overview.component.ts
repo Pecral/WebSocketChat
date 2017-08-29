@@ -9,7 +9,7 @@ import { ChatUser } from './../../../shared/models/chat/chat-user';
 import { ChatRoom } from './../../../shared/models/chat/chat-room';
 import * as moment from 'moment';
 
-import { NavigationService } from './../../../shared/settings/navigation.service';
+import { AppSettingsService } from './../../../shared/settings/app-settings.service';
 
 @Component({
    selector: 'room-overview',
@@ -27,7 +27,7 @@ export class ChatRoomOverviewComponent implements OnInit {
    @Input()
    selfIdentifier: ChatUser;
 
-   constructor(private router: Router, public navigation: NavigationService) { }
+   constructor(private router: Router, public navigation: AppSettingsService) { }
 
    ngOnInit() {
    }

@@ -3,7 +3,7 @@
 @mixin btn-outline-light() {
    color: $light-background-color;
    background-image: none;
-   background-color: transparent;
+   background-color: $dark-menu-color;
    border-color: $light-background-color;
    &:hover {
       background-color: $light-background-color;
@@ -28,7 +28,7 @@
 @mixin btn-outline-dark() {
    color: $dark-menu-color;
    background-image: none;
-   background-color: transparent;
+   background-color: $light-background-color;
    border-color: $dark-menu-color;
    &:hover {
       background-color: $dark-menu-color;
